@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/examples/">
+    <Project Path="examples/GrayHare.GameEngine.DemoHub/GrayHare.GameEngine.DemoHub.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src\GrayHare.GameEngine\GrayHare.GameEngine.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests\GrayHare.GameEngine.Tests\GrayHare.GameEngine.Tests.csproj" />
+  </Folder>
+</Solution>

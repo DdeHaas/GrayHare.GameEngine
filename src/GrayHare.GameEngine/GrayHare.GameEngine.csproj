@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>GrayHare.GameEngine</PackageId>
+    <!--
+      VersionPrefix  – numeric part used for AssemblyVersion / FileVersion (must be X.Y.Z).
+      VersionSuffix  – pre-release label (e.g. alpha, beta, rc1); leave empty for stable releases.
+      MSBuild derives: Version              = VersionPrefix[-VersionSuffix]  (NuGet package version)
+                       AssemblyVersion      = VersionPrefix.0                (CLR binding version)
+                       FileVersion          = VersionPrefix.0                (Win32 file version)
+                       InformationalVersion = Version                        (human-readable, includes pre-release tag)
+    -->
+    <VersionPrefix>0.6.1</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <Title>GrayHare.GameEngine</Title>
+    <Description>Lightweight 2D game engine for .NET built on SFML.Net 3.0.0, with scene management, ECS, input, asset caching, audio, camera control, animation, steering behaviors, spatial queries, and grid pathfinding.</Description>
+    <Authors>(D. de Haas) GrayHare</Authors>
+    <Copyright>Copyright (c) 2026 (D. de Haas) GrayHare</Copyright>
+    <PackageTags>game-engine;2d;cross-platform;dotnet;csharp;sfml.net;sfml;ecs;game-development;grayhare</PackageTags>
+    <PackageProjectUrl>https://github.com/ddehaas/GrayHare.GameEngine</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ddehaas/GrayHare.GameEngine</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <PackageLicenseExpression>Zlib</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>First public release. Includes the GameApplication and GameHost runtime, scene stack and layers, ECS, input and action mapping, cached assets and GLSL shaders, audio, camera and animation helpers, steering behaviors, spatial queries, and grid pathfinding.</PackageReleaseNotes>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IsPackable>true</IsPackable>
+	<Platforms>AnyCPU;x64;x86</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="GrayHare.GameEngine.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+	<None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
+    <None Include="..\..\package-icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SFML.Net" Version="3.0.0" />
+  </ItemGroup>
+
+</Project>
