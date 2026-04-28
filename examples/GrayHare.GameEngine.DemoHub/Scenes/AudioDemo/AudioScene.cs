@@ -14,6 +14,13 @@ internal sealed class AudioScene : DemoSceneBase
 
     public AudioScene(DemoCatalog catalog, int sceneIndex) : base(catalog, sceneIndex) { }
 
+    public override void Load(GameHost host)
+    {
+        host.Audio.PrewarmSound(Catalog.Assets.BeepSoundPath);
+
+        base.Load(host);
+    }
+
     public override void Update(GameHost host, in GameTime gameTime)
     {
         base.Update(host, in gameTime);

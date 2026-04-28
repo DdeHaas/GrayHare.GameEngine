@@ -10,7 +10,7 @@
                        FileVersion          = VersionPrefix.0                (Win32 file version)
                        InformationalVersion = Version                        (human-readable, includes pre-release tag)
     -->
-    <VersionPrefix>0.6.1</VersionPrefix>
+    <VersionPrefix>0.6.2</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <Title>GrayHare.GameEngine</Title>
     <Description>Lightweight 2D game engine for .NET built on SFML.Net 3.0.0, with scene management, ECS, input, asset caching, audio, camera control, animation, steering behaviors, spatial queries, and grid pathfinding.</Description>

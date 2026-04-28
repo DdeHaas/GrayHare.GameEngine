@@ -20,12 +20,14 @@ internal sealed class MusicScene : DemoSceneBase
 
     public override void Load(GameHost host)
     {
-        base.Load(host);
         _font = host.Assets.LoadFont();
 
+        host.Audio.PrewarmSound(Catalog.Assets.BeepSoundPath);
         host.Audio.SetMasterVolume(25f);
         host.Audio.SetMusicVolume(40f);
         host.Audio.PlayMusic(MusicTrackPath, volume: 100f, loop: true);
+
+        base.Load(host);
     }
 
     public override void Unload(GameHost host)

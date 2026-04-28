@@ -6,6 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.6.2] - 2026-04-26
+
+### Added
+
+- [A step-by-step guide for building a basic Tetris game](docs/how-to-tetris.md).
+
+### Fixed
+
+- `AudioPlayer.PlaySound` now reuses stopped `Sound` instances from an internal pool instead of allocating a new OpenAL source on every call. This eliminates the per-call `alGenSources` hitch that caused small pauses in the game loop when sound effects fired during gameplay.
+
+### Changed
+
+- README
+
 ## [0.6.1] — First public release
 
 ### Added

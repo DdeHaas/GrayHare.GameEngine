@@ -2,8 +2,8 @@
 
 ## Overview
 
-GrayHare.GameEngine is a lightweight 2D game engine built on [SFML.Net 3.0.0](https://www.sfml-dev.org/) for .NET applications.
-It provides a small runtime centered around `GameApplication`, `GameHost`, `GameSceneBase`, and `World`, so you can build scene-driven games with cached assets, audio, input, camera control, animation, steering behaviors, spatial queries, and grid pathfinding without a large framework.
+GrayHare.GameEngine is a lightweight cross-platform 2D game engine built on [SFML.Net 3.0.0](https://www.sfml-dev.org/) for .NET applications.
+It provides a small runtime centered around `GameApplication`, `GameHost`, `GameSceneBase`, and `World`, so you can build scene-driven games with cached assets, audio, input, camera control, animation, steering behaviors, spatial queries, and grid pathfinding without a large framework. It has been tested on Windows and Linux Mint.
 
 ## Installation
 
@@ -18,7 +18,7 @@ dotnet add package GrayHare.GameEngine
 To start the example hub from the repository root, run:
 
 ```powershell
-dotnet run --project .\GrayHare.GameEngine\examples\GrayHare.GameEngine.DemoHub\GrayHare.GameEngine.DemoHub.csproj
+dotnet run --project .\examples\GrayHare.GameEngine.DemoHub\GrayHare.GameEngine.DemoHub.csproj
 ```
 
 The DemoHub creates its demo assets automatically on first run.
@@ -40,6 +40,8 @@ The DemoHub creates its demo assets automatically on first run.
 ## Documentation
 
 Additional documentation is available in [`docs\README.md`](docs/README.md). A Dutch version is available in [`docs\README.nl.md`](docs/README.nl.md).
+
+A step-by-step guide for building a basic Tetris game is available in [`docs\how-to-tetris.md`](docs/how-to-tetris.md).
 
 ## Requirements
 

@@ -13,7 +13,9 @@ namespace GrayHare.GameEngine.Audio;
 public sealed class AudioPlayer : IDisposable
 {
     private readonly AssetStore _assets;
-    private readonly List<(Sound Sound, float OriginalVolume)> _activeSounds = [];
+    // Pool of Sound instances keyed by their OpenAL source. Stopped entries are reused in-place to
+    // avoid the per-call allGenSources allocation that causes hitches on the main thread.
+    private readonly List<(Sound Sound, float OriginalVolume)> _soundPool = [];
     private Music? _currentMusic;
     private float _currentMusicVolume = 100f;
     private bool _disposed;
@@ -45,7 +47,22 @@ public sealed class AudioPlayer : IDisposable
     public int MaxActiveSounds { get; set; } = 32;
 
     /// <summary>Number of <see cref="Sound"/> instances currently playing or paused.</summary>
-    public int ActiveSoundCount => _activeSounds.Count;  // tuple list, Count is still correct
+    public int ActiveSoundCount
+    {
+        get
+        {
+            int count = 0;
+            foreach ((Sound sound, _) in _soundPool)
+            {
+                if (sound.Status != SoundStatus.Stopped)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+    }
 
     /// <summary>Returns <see langword="true"/> when a music track is currently playing.</summary>
     public bool IsMusicPlaying => _currentMusic?.Status is SoundStatus.Playing;
@@ -59,30 +76,103 @@ public sealed class AudioPlayer : IDisposable
     // ── Sound effects ────────────────────────────────────────────────
 
     /// <summary>
+    /// Loads the sound buffer for <paramref name="assetPath"/> and pre-allocates a pooled OpenAL
+    /// source by playing it silently then stopping it immediately.
+    /// </summary>
+    /// <remarks>
+    /// Call this from <c>Load</c> for every sound the scene will play during gameplay. Without it,
+    /// the first <see cref="PlaySound"/> call for a given path stalls on <c>alGenSources</c>
+    /// allocation, causing a brief hitch in the update loop.
+    /// </remarks>
+    /// <param name="assetPath">Asset-relative or absolute path to the audio file.</param>
+    public void PrewarmSound(string assetPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(assetPath);
+
+        if (_soundPool.Count >= MaxActiveSounds)
+        {
+            return;
+        }
+
+        SoundBuffer buffer = _assets.LoadSoundBuffer(assetPath);
+
+        // Allocate the OpenAL source now, at load time, rather than on the first gameplay play call.
+        Sound sound = new(buffer) { Volume = 0f };
+        sound.Play();
+        sound.Stop();
+
+        // Restore to the current effective volume so ApplyVolumeToActiveSounds stays consistent.
+        sound.Volume = EffectiveSfxVolume;
+
+        _soundPool.Add((sound, 100f));
+    }
+
+    /// <summary>
     /// Plays a sound effect from <paramref name="assetPath"/>.
     /// Returns <see langword="null"/> when <see cref="MaxActiveSounds"/> has been reached.
     /// </summary>
+    /// <remarks>
+    /// The returned <see cref="Sound"/> is a pooled instance owned by this player.
+    /// Do not retain the reference; it may be reassigned to a different sound on the next play call.
+    /// </remarks>
     /// <param name="assetPath">Asset-relative or absolute path to the audio file.</param>
     /// <param name="volume">Per-sound volume in the range [0, 100], scaled by the effective SFX volume.</param>
     /// <param name="loop">Whether the sound loops.</param>
     /// <returns>The started <see cref="Sound"/> instance, or <see langword="null"/> if the limit was reached.</returns>
     public Sound? PlaySound(string assetPath, float volume = 100f, bool loop = false)
     {
-        if (_activeSounds.Count >= MaxActiveSounds)
+        ArgumentException.ThrowIfNullOrWhiteSpace(assetPath);
+
+        // Count active (playing/paused) sounds and locate the first stopped entry for reuse.
+        int activeCount = 0;
+        int reusableIndex = -1;
+        for (int i = 0; i < _soundPool.Count; i++)
+        {
+            if (_soundPool[i].Sound.Status == SoundStatus.Stopped)
+            {
+                if (reusableIndex == -1)
+                {
+                    reusableIndex = i;
+                }
+            }
+            else
+            {
+                activeCount++;
+            }
+        }
+
+        if (activeCount >= MaxActiveSounds)
         {
             EngineLogger.Log($"AudioPlayer: MaxActiveSounds ({MaxActiveSounds}) reached; skipping '{assetPath}'.");
             return null;
         }
 
         SoundBuffer buffer = _assets.LoadSoundBuffer(assetPath);
-        Sound sound = new(buffer)
+        float effectiveVolume = volume * EffectiveSfxVolume / 100f;
+
+        Sound sound;
+        if (reusableIndex >= 0)
         {
-            Volume = volume * EffectiveSfxVolume / 100f,
-            IsLooping = loop
-        };
+            // Reuse the stopped Sound source to avoid a new alGenSources allocation.
+            sound = _soundPool[reusableIndex].Sound;
+            sound.SoundBuffer = buffer;
+            sound.Pitch = 1.0f;
+            sound.Pan = 0.0f;
+            sound.Volume = effectiveVolume;
+            sound.IsLooping = loop;
+            _soundPool[reusableIndex] = (sound, volume);
+        }
+        else
+        {
+            sound = new Sound(buffer)
+            {
+                Volume = effectiveVolume,
+                IsLooping = loop
+            };
+            _soundPool.Add((sound, volume));
+        }
 
         sound.Play();
-        _activeSounds.Add((sound, volume));
 
         return sound;
     }
@@ -194,21 +284,13 @@ public sealed class AudioPlayer : IDisposable
     // ── Frame update ─────────────────────────────────────────────────
 
     /// <summary>
-    /// Removes and disposes any sounds that have finished playing.
-    /// Called automatically by the engine once per frame; scenes do not need to call this.
+    /// Reserved for engine frame-update calls.
+    /// The sound pool is self-managing: stopped entries are reused in-place by <see cref="PlaySound"/>
+    /// and do not need per-frame disposal.
     /// </summary>
     public void Update()
     {
-        for (int index = _activeSounds.Count - 1; index >= 0; index--)
-        {
-            if (_activeSounds[index].Sound.Status != SoundStatus.Stopped)
-            {
-                continue;
-            }
-
-            _activeSounds[index].Sound.Dispose();
-            _activeSounds.RemoveAt(index);
-        }
+        // Pool entries are reused by PlaySound; no per-frame removal or disposal is needed.
     }
 
     // ── Cleanup ──────────────────────────────────────────────────────
@@ -216,13 +298,10 @@ public sealed class AudioPlayer : IDisposable
     /// <summary>Immediately stops and disposes all active sounds and the current music track.</summary>
     public void StopAll()
     {
-        foreach ((Sound sound, _) in _activeSounds)
+        foreach ((Sound sound, _) in _soundPool)
         {
             sound.Stop();
-            sound.Dispose();
         }
-
-        _activeSounds.Clear();
 
         StopMusic();
     }
@@ -236,7 +315,16 @@ public sealed class AudioPlayer : IDisposable
         }
 
         _disposed = true;
-        StopAll();
+
+        foreach ((Sound sound, _) in _soundPool)
+        {
+            sound.Stop();
+            sound.Dispose();
+        }
+
+        _soundPool.Clear();
+
+        StopMusic();
     }
 
     // ── Private helpers ──────────────────────────────────────────────
@@ -247,7 +335,7 @@ public sealed class AudioPlayer : IDisposable
     private void ApplyVolumeToActiveSounds()
     {
         float effective = EffectiveSfxVolume;
-        foreach ((Sound sound, float originalVolume) in _activeSounds)
+        foreach ((Sound sound, float originalVolume) in _soundPool)
         {
             sound.Volume = originalVolume * effective / 100f;
         }
