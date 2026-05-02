@@ -1,11 +1,14 @@
 using GrayHare.GameEngine.DemoHub.Scenes.AnimationDemo;
+using GrayHare.GameEngine.DemoHub.Scenes.AnimationOneShotDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.AssetFallbackDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.AudioDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.AvoidanceDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.CameraDemo;
+using GrayHare.GameEngine.DemoHub.Scenes.CameraExtrasDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.ClearColorDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.DriftingDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.Ecs3Demo;
+using GrayHare.GameEngine.DemoHub.Scenes.EcsComponentOpsDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.EcsDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.EcsRecyclingDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.ExplosionAnimationDemo;
@@ -35,8 +38,10 @@ using GrayHare.GameEngine.DemoHub.Scenes.ShaderHighlanderDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.ShaderPixelateDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.ShaderStormBlinkDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.ShaderWaveDemo;
+using GrayHare.GameEngine.DemoHub.Scenes.ShapeTextureDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.SpriteDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.SteeringDemo;
+using GrayHare.GameEngine.DemoHub.Scenes.StrafingDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.TextDemo;
 using GrayHare.GameEngine.DemoHub.Scenes.TimeScaleDemo;
 using GrayHare.GameEngine.Scenes;
@@ -48,6 +53,8 @@ internal sealed class DemoCatalog
 {
     public DemoCatalog(DemoAssetsManifest assets)
     {
+        ArgumentNullException.ThrowIfNull(assets);
+
         Assets = assets;
         Entries = BuildEntries();
         Groups = BuildGroups(Entries);
@@ -66,6 +73,7 @@ internal sealed class DemoCatalog
     public GameSceneBase Create(int index)
     {
         int normalized = Normalize(index);
+
         return Entries[normalized].Factory(this, normalized);
     }
 
@@ -74,6 +82,7 @@ internal sealed class DemoCatalog
     {
         int count = Entries.Count;
         int normalized = index % count;
+
         return normalized < 0 ? normalized + count : normalized;
     }
 
@@ -170,12 +179,15 @@ internal sealed class DemoCatalog
             new("ECS – Entity Recycling & ForEach", "ECS",
                 "Shows entity ID reuse after removal; ForEach iteration over recycled slots.",
                 static (c, i) => new EcsRecyclingScene(c, i)),
+            new("ECS – Component Ops", "ECS",
+                "HasComponent · TryGetComponent · RemoveComponent · World.Clear\nH toggle highlight · T try-get · R remove all · C clear + re-spawn",
+                static (c, i) => new EcsComponentOpsScene(c, i)),
 
             // ── Input ────────────────────────────────────────────────────────
             new("Input - Visualization", "Input",
                 "Keyboard and mouse visualized in real time.",
                 static (c, i) => new KeyboardMouseScene(c, i)),
-            new("Game Controller – Tester", "Input",
+            new("Input - Game Controller", "Input",
                 "Visualizes both analog sticks and buttons in real time.\nButton indices follow DsHidMini SXS layout. All raw axes shown at bottom.",
                 static (c, i) => new GameControllerScene(c, i)),
             new("Input Actions – Named Bindings", "Input",
@@ -189,6 +201,9 @@ internal sealed class DemoCatalog
             new("Movement – With Drift", "Movement",
                 "W/S throttle and brake  ·  A/D turn  ·  ` toggle debug overlay",
                 static (c, i) => new DriftingScene(c, i)),
+            new("Movement – Strafe", "Movement",
+                "W/S forward/backward  ·  A/D strafe  ·  ←/→ or mouse  rotate heading  ·  ` toggle debug overlay\nDemonstrates MovementBehavior + standalone RotationBehavior.",
+                static (c, i) => new StrafingScene(c, i)),
 
             // ── Steering ─────────────────────────────────────────────────────
             new("Steering – Wander + Bounds", "Steering",
@@ -229,6 +244,9 @@ internal sealed class DemoCatalog
             new("Animation – Sprite Sheet", "Rendering",
                 "AnimationPlayer drives a 4-frame sprite sheet at 120 ms per frame.",
                 static (c, i) => new AnimationScene(c, i)),
+            new("Animation – One-Shot & Reset", "Rendering",
+                "Non-looping AnimationPlayer.  Space reset + replay  ·  P pause / resume\nShows IsFinished state with colour-coded label.",
+                static (c, i) => new AnimationOneShotScene(c, i)),
             new("Animation – Explosion", "Rendering",
                 "Multiple looping explosion animations from a texture sequence.\nLeft-click add  ·  Right-click remove  ·  P: pause/resume",
                 static (c, i) => new ExplosionAnimationScene(c, i)),
@@ -266,6 +284,9 @@ internal sealed class DemoCatalog
             new("Camera – Follow / Zoom / Shake", "Scene Management",
                 "WASD move  ·  Z/X zoom in/out  ·  Space screen-shake",
                 static (c, i) => new CameraScene(c, i)),
+            new("Camera – Rotation & Coordinate Conversion", "Scene Management",
+                "Q/E rotate  ·  R reset rotation  ·  LMB ScreenToWorld\nYellow crosshair tracks pinned world object via WorldToScreen.",
+                static (c, i) => new CameraExtrasScene(c, i)),
             new("GameTime – TimeScale / Pause", "Scene Management",
                 "Space pause / resume  ·  Tab toggle slow-motion (×0.25)\nLeft square uses scaled delta; right always spins.",
                 static (c, i) => new TimeScaleScene(c, i)),
@@ -282,6 +303,9 @@ internal sealed class DemoCatalog
             new("Assets – Fallback Texture", "Assets",
                 "Left: valid texture. Right: missing file → magenta checkerboard fallback.",
                 static (c, i) => new AssetFallbackScene(c, i)),
+            new("Assets – Shape Textures & Unload", "Assets",
+                "ShapeExtensions.ToTexture() · AssetStore.Unload · EngineLogger\nU unload checker  ·  R reload",
+                static (c, i) => new ShapeTextureScene(c, i)),
 
             // ── Pathfinding ──────────────────────────────────────────────────
             new("Pathfinding – Grid Search", "Pathfinding",
@@ -320,6 +344,6 @@ internal sealed class DemoCatalog
             groups.Add(new DemoGroup(currentGroupName, startIndex, entries.Count));
         }
 
-        return [.. groups];
+        return groups.ToArray();
     }
 }

@@ -22,6 +22,7 @@ internal sealed class DriftingScene : DemoSceneBase
     public override void Load(GameHost host)
     {
         base.Load(host);
+
         _ship.Position = new Vector2f(640f, 360f);
         _ship.RotationDegrees = 0f;
         _ship.HeadingRef = _ship.RotationDegrees.ToVector2f().Normalized();
@@ -37,15 +38,15 @@ internal sealed class DriftingScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         _ship.Drifting.IsMovingForwards = host.Input.IsKeyDown(Keyboard.Key.W);
         _ship.Drifting.IsBraking = host.Input.IsKeyDown(Keyboard.Key.S);
         _ship.Drifting.IsTurningLeft = host.Input.IsKeyDown(Keyboard.Key.A);
         _ship.Drifting.IsTurningRight = host.Input.IsKeyDown(Keyboard.Key.D);
 
-        _velocity = _ship.Drifting.Update(dt, ref _ship.RotationDegrees, ref _ship.HeadingRef);
+        _velocity = _ship.Drifting.Update(deltaTime, ref _ship.RotationDegrees, ref _ship.HeadingRef);
         _ship.Velocity = _velocity;
-        _ship.Position = (_ship.Position + (_velocity * dt)).WrapPosition(host.Window.Size);
+        _ship.Position = (_ship.Position + (_velocity * deltaTime)).WrapPosition(host.Window.Size);
     }
 
     public override void RenderLayer(GameHost host, RenderWindow window)

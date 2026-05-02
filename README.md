@@ -2,7 +2,7 @@
 
 ## Overview
 
-GrayHare.GameEngine is a lightweight cross-platform 2D game engine built on [SFML.Net 3.0.0](https://www.sfml-dev.org/) for .NET applications.
+GrayHare.GameEngine is a lightweight cross-platform 2D game engine built on [SFML.Net 3.0.0](https://www.sfml-dev.org/download/sfml.net/) for .NET applications.
 It provides a small runtime centered around `GameApplication`, `GameHost`, `GameSceneBase`, and `World`, so you can build scene-driven games with cached assets, audio, input, camera control, animation, steering behaviors, spatial queries, and grid pathfinding without a large framework. It has been tested on Windows and Linux Mint.
 
 ## Installation

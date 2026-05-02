@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using SFML.Graphics;
 using SFML.System;
 

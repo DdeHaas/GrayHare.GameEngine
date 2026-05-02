@@ -25,6 +25,7 @@ public sealed class AssetStoreLoadTests : IDisposable
     {
         string path = Path.Combine(_contentRoot, name);
         File.WriteAllText(path, "P3\n1 1\n255\n255 0 0\n");
+
         return name;
     }
 

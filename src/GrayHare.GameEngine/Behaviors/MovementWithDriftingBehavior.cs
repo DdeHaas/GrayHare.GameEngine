@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using SFML.System;
 
 namespace GrayHare.GameEngine.Behaviors;
@@ -29,6 +28,7 @@ public sealed class MovementWithDriftingBehavior
     public MovementWithDriftingBehavior(IMovableGameObject gameObject)
     {
         ArgumentNullException.ThrowIfNull(gameObject);
+
         _gameObject = gameObject;
         _rotationBehavior = new RotationBehavior(gameObject);
         _movementBehavior = new MovementBehavior(gameObject);
@@ -76,6 +76,7 @@ public sealed class MovementWithDriftingBehavior
     public Vector2f Update(float deltaTime, ref float rotation, ref Vector2f heading)
     {
         rotation = _rotationBehavior.UpdateRotation(deltaTime, ref heading);
-        return _movementBehavior.UpdateMovement(deltaTime, _gameObject.Velocity, _gameObject.Position);
+
+        return _movementBehavior.UpdateMovement(deltaTime, _gameObject.Velocity);
     }
 }

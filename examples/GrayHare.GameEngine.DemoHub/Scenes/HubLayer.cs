@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using SFML.Graphics;
 using SFML.System;
@@ -22,17 +21,17 @@ internal sealed class HubLayer : ISceneLayer
 
     private static readonly string _navHints =
         "+  next      -  prev\n" +
-        "PgDn  next group\n" +
-        "PgUp  prev group\n" +
         "Esc   exit";
 
     private readonly DemoCatalog _catalog;
     private readonly int _sceneIndex;
 
-    private Font? _font;
+    private Font _font = null!;
 
     public HubLayer(DemoCatalog catalog, int sceneIndex)
     {
+        ArgumentNullException.ThrowIfNull(catalog);
+
         _catalog = catalog;
         _sceneIndex = sceneIndex;
     }
@@ -50,11 +49,6 @@ internal sealed class HubLayer : ISceneLayer
     public void RenderLayer(GameHost host, RenderWindow window)
     {
         DrawPanel(window);
-
-        if (_font is null)
-        {
-            return;
-        }
 
         DemoEntry entry = _catalog.Entries[_sceneIndex];
         DemoGroup group = _catalog.GroupOf(_sceneIndex);
@@ -95,7 +89,7 @@ internal sealed class HubLayer : ISceneLayer
 
     private void DrawNavHints(RenderWindow window, float x, float y)
     {
-        using Text nav = new(_font!, _navHints, 13)
+        using Text nav = new(_font, _navHints, 13)
         {
             Position = new Vector2f(x, y),
             FillColor = new Color(110, 125, 155)
@@ -108,7 +102,7 @@ internal sealed class HubLayer : ISceneLayer
     {
         string tag = $"[ {group.Name} ]   {_sceneIndex + 1} / {_catalog.Entries.Count}";
 
-        using Text text = new(_font!, tag, 13)
+        using Text text = new(_font, tag, 13)
         {
             Position = new Vector2f(PaddingX, y),
             FillColor = new Color(100, 145, 210)
@@ -119,7 +113,7 @@ internal sealed class HubLayer : ISceneLayer
 
     private void DrawTitle(RenderWindow window, DemoEntry entry, float y)
     {
-        using Text text = new(_font!, entry.Title, 20)
+        using Text text = new(_font, entry.Title, 20)
         {
             Position = new Vector2f(PaddingX, y),
             FillColor = new Color(235, 242, 255)
@@ -130,7 +124,7 @@ internal sealed class HubLayer : ISceneLayer
 
     private void DrawDescription(RenderWindow window, DemoEntry entry, float y)
     {
-        using Text text = new(_font!, entry.Description, 14)
+        using Text text = new(_font, entry.Description, 14)
         {
             Position = new Vector2f(PaddingX, y),
             FillColor = new Color(170, 182, 205)

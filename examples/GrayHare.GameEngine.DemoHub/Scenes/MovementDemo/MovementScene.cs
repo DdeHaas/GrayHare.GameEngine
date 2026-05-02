@@ -37,15 +37,15 @@ internal sealed class MovementScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         _ship.Movement.IsMovingForwards = host.Input.IsKeyDown(Keyboard.Key.W);
         _ship.Movement.IsBraking = host.Input.IsKeyDown(Keyboard.Key.S);
         _ship.Movement.IsTurningLeft = host.Input.IsKeyDown(Keyboard.Key.A);
         _ship.Movement.IsTurningRight = host.Input.IsKeyDown(Keyboard.Key.D);
 
-        _velocity = _ship.Movement.Update(dt, ref _ship.RotationDegrees, ref _ship.HeadingRef);
+        _velocity = _ship.Movement.Update(deltaTime, ref _ship.RotationDegrees, ref _ship.HeadingRef);
         _ship.Velocity = _velocity;
-        _ship.Position = (_ship.Position + (_velocity * dt)).WrapPosition(host.Window.Size);
+        _ship.Position = (_ship.Position + (_velocity * deltaTime)).WrapPosition(host.Window.Size);
     }
 
     public override void RenderLayer(GameHost host, RenderWindow window)

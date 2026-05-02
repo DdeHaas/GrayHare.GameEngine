@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using SFML.Graphics;
 using SFML.System;
@@ -16,6 +15,8 @@ internal sealed class HudLayer : ISceneLayer
 
     public HudLayer(Font font)
     {
+        ArgumentNullException.ThrowIfNull(font);
+
         _font = font;
     }
 

@@ -22,7 +22,7 @@ public sealed class Camera2D
     private float _shakeDuration;
     private float _shakeTimeRemaining;
     private Vector2f _shakeOffset;
-    private Random _random = Random.Shared;
+    private readonly Random _random = Random.Shared;
 
     /// <summary>
     /// Initializes a new <see cref="Camera2D"/> whose viewport matches

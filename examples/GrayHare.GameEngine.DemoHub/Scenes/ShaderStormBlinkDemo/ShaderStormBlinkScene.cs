@@ -14,7 +14,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.ShaderStormBlinkDemo;
 internal sealed class ShaderStormBlinkScene : DemoSceneBase
 {
     private Shader? _shader;
-    private Font? _font;
+    private Font _font = null!;
     private Text? _fallbackText;
     private VertexArray? _points;
 
@@ -102,6 +102,7 @@ internal sealed class ShaderStormBlinkScene : DemoSceneBase
         if (_fallbackText is not null)
         {
             window.Draw(_fallbackText);
+
             return;
         }
 

@@ -13,9 +13,9 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.ShaderBlurDemo;
 /// </summary>
 internal sealed class ShaderBlurScene : DemoSceneBase
 {
-    private Sprite? _sprite;
+    private Sprite _sprite = null!;
     private Shader? _shader;
-    private Font? _font;
+    private Font _font = null!;
     private Text? _fallbackText;
 
     public ShaderBlurScene(DemoCatalog catalog, int sceneIndex)
@@ -57,7 +57,7 @@ internal sealed class ShaderBlurScene : DemoSceneBase
             return;
         }
 
-        Texture texture = host.Assets.LoadTexture("background.jpg", smooth: true);
+        Texture texture = host.Assets.LoadTexture(Catalog.Assets.BackgroundImagePath, smooth: true);
 
         float x = host.Window.Size.X / 2f - texture.Size.X / 2f;
         float y = host.Window.Size.Y / 2f - texture.Size.Y / 2f;
@@ -96,7 +96,7 @@ internal sealed class ShaderBlurScene : DemoSceneBase
             return;
         }
 
-        if (_sprite is null || _shader is null)
+        if (_shader is null)
         {
             return;
         }

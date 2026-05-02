@@ -15,8 +15,8 @@ internal sealed class InputActionScene : DemoSceneBase
     private const float MoveSpeed = 200f;
     private const float SquareSize = 40f;
 
-    private Font? _font;
-    private InputActionMap? _actions;
+    private Font _font = null!;
+    private InputActionMap _actions = null!;
     private Vector2f _squarePos;
     private Color _squareColor = new(80, 200, 255);
     private float _flashTimer;
@@ -58,7 +58,7 @@ internal sealed class InputActionScene : DemoSceneBase
             return;
         }
 
-        float dt = gameTime.DeltaTotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
 
         // Keyboard-based movement via actions.
         Vector2f move = new(0f, 0f);
@@ -93,7 +93,7 @@ internal sealed class InputActionScene : DemoSceneBase
             move /= len;
         }
 
-        _squarePos += move * MoveSpeed * dt;
+        _squarePos += move * MoveSpeed * deltaTime;
 
         // Clamp to window.
         float half = SquareSize / 2f;
@@ -109,7 +109,7 @@ internal sealed class InputActionScene : DemoSceneBase
 
         if (_flashTimer > 0f)
         {
-            _flashTimer -= dt;
+            _flashTimer -= deltaTime;
             _squareColor = new Color(255, 255, 80);
         }
         else
@@ -130,7 +130,7 @@ internal sealed class InputActionScene : DemoSceneBase
         };
         window.Draw(square);
 
-        if (_font is null || _actions is null)
+        if (_actions is null)
         {
             return;
         }

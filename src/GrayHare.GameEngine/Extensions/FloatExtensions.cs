@@ -12,6 +12,7 @@ public static class FloatExtensions
     public static Vector2f ToVector2f(this float degrees)
     {
         float radians = Angle.FromDegrees(degrees).Radians;
+
         return new Vector2f(MathF.Cos(radians), MathF.Sin(radians));
     }
 }

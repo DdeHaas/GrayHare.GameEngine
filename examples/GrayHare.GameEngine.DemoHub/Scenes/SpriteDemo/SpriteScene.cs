@@ -7,7 +7,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.SpriteDemo;
 
 internal sealed class SpriteScene : DemoSceneBase
 {
-    private Sprite? _sprite;
+    private Sprite _sprite = null!;
     private Vector2f _position = new(640f, 360f);
 
     public SpriteScene(DemoCatalog catalog, int sceneIndex) : base(catalog, sceneIndex) { }
@@ -28,11 +28,6 @@ internal sealed class SpriteScene : DemoSceneBase
     public override void Update(GameHost host, in GameTime gameTime)
     {
         base.Update(host, in gameTime);
-
-        if (_sprite is null)
-        {
-            return;
-        }
 
         Vector2f moveDirection = new(0f, 0f);
         if (host.Input.IsKeyDown(Keyboard.Key.A) || host.Input.IsKeyDown(Keyboard.Key.Left))
@@ -55,7 +50,8 @@ internal sealed class SpriteScene : DemoSceneBase
             moveDirection.Y += 1f;
         }
 
-        float speed = 280f * (float)gameTime.Delta.TotalSeconds;
+        float speed = 280f * gameTime.DeltaTotalSeconds;
+
         _position = new Vector2f(
             _position.X + moveDirection.X * speed,
             _position.Y + moveDirection.Y * speed);
@@ -65,9 +61,6 @@ internal sealed class SpriteScene : DemoSceneBase
 
     public override void RenderLayer(GameHost host, RenderWindow window)
     {
-        if (_sprite is not null)
-        {
-            window.Draw(_sprite);
-        }
+        window.Draw(_sprite);
     }
 }

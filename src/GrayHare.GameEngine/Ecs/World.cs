@@ -179,6 +179,7 @@ public sealed class World
         }
 
         component = default!;
+
         return false;
     }
 
@@ -463,6 +464,7 @@ public sealed class World
 
         ComponentStore<TComponent> newStore = new();
         _stores[typeof(TComponent)] = newStore;
+
         return newStore;
     }
 
@@ -505,10 +507,12 @@ public sealed class World
             if (_components.TryGetValue(entityId, out TComponent? value))
             {
                 component = value;
+
                 return true;
             }
 
             component = default!;
+
             return false;
         }
 

@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using GrayHare.GameEngine.Behaviors;
 using GrayHare.GameEngine.Extensions;
@@ -53,7 +52,7 @@ internal sealed class FlockingLeaderScene : DemoSceneBase
     // Neighbor lists built once per Update and reused in Render.
     private List<IMovableGameObject>[] _neighborCache = [];
 
-    private Font? _font;
+    private Font _font = null!;
     private double _fps;
     private double _updateMs;
     private bool _flee;
@@ -122,7 +121,7 @@ internal sealed class FlockingLeaderScene : DemoSceneBase
             _leaderMode = LeaderMode.SeekDestination;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         Vector2f windowSize = new(host.Window.Size.X, host.Window.Size.Y);
         FloatRect bounds = new(Constants.Vectors.Zero, windowSize);
 
@@ -147,10 +146,10 @@ internal sealed class FlockingLeaderScene : DemoSceneBase
             (leaderSteer, 1f),   // seek destination or wander
             (leaderBounds, 2f));  // higher weight: keep leader on screen
 
-        _leader.Velocity = (_leader.Velocity + (leaderForce * dt)).Truncate(_leader.MaxSpeed);
+        _leader.Velocity = (_leader.Velocity + (leaderForce * deltaTime)).Truncate(_leader.MaxSpeed);
         _leader.HeadingRef = _leaderSteering.UpdateHeadingWhileMoving(
-            dt, ref _leader.RotationDegrees);
-        _leader.Position += _leader.Velocity * dt;
+            deltaTime, ref _leader.RotationDegrees);
+        _leader.Position += _leader.Velocity * deltaTime;
 
         // ── Boids ────────────────────────────────────────────────────────────
 
@@ -177,39 +176,39 @@ internal sealed class FlockingLeaderScene : DemoSceneBase
 
         for (int i = 0; i < _boids.Count; i++)
         {
-            Boid b = _boids[i];
+            Boid boid = _boids[i];
             IReadOnlyList<IMovableGameObject> neighbors = _neighborCache[i];
 
             // Low-priority pull toward the leader; flocking forces keep them cohesive.
             Vector2f leaderSeek = Constants.Vectors.Zero;
             if (_flee)
             {
-                leaderSeek = b.Steering.Flee(_leader.Position);
+                leaderSeek = boid.Steering.Flee(_leader.Position);
             }
             else
             {
-                leaderSeek = b.Steering.Seek(_leader.Position);
+                leaderSeek = boid.Steering.Seek(_leader.Position);
             }
 
-            Vector2f cohesionForce = b.Steering.Cohesion(neighbors);
-            Vector2f alignForce = b.Steering.Alignment(neighbors);
-            Vector2f separateForce = b.Steering.Separation(neighbors, SeparationRadius);
+            Vector2f cohesionForce = boid.Steering.Cohesion(neighbors);
+            Vector2f alignForce = boid.Steering.Alignment(neighbors);
+            Vector2f separateForce = boid.Steering.Separation(neighbors, SeparationRadius);
 
             // Weighted blend: separation prevents overlap; social forces keep the flock cohesive.
             Vector2f force = SteeringForces.WeightedSum(
-                b.Agent.MaxSpeed,
+                boid.Agent.MaxSpeed,
                 (separateForce, 4f),  // highest weight: personal space is non-negotiable
                 (alignForce, 3f),
                 (cohesionForce, 2f),
                 (leaderSeek, 1f));    // lowest weight: gentle pull toward the leader
 
-            b.Agent.Velocity = (b.Agent.Velocity + (force * dt)).Truncate(b.Agent.MaxSpeed);
-            b.Agent.HeadingRef = b.Steering.UpdateHeadingWhileMoving(
-                dt, ref b.Agent.RotationDegrees);
-            b.Agent.Position = (b.Agent.Position + (b.Agent.Velocity * dt)).WrapPosition(windowSize);
+            boid.Agent.Velocity = (boid.Agent.Velocity + (force * deltaTime)).Truncate(boid.Agent.MaxSpeed);
+            boid.Agent.HeadingRef = boid.Steering.UpdateHeadingWhileMoving(
+                deltaTime, ref boid.Agent.RotationDegrees);
+            boid.Agent.Position = (boid.Agent.Position + (boid.Agent.Velocity * deltaTime)).WrapPosition(windowSize);
         }
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -245,18 +244,15 @@ internal sealed class FlockingLeaderScene : DemoSceneBase
 
         for (int i = 0; i < _boids.Count; i++)
         {
-            Boid b = _boids[i];
+            Boid boid = _boids[i];
             IReadOnlyList<IMovableGameObject> neighbors = _neighborCache[i];
 
-            b.Debug.DrawVelocityAndHeading(window);
-            b.Agent.Draw(window);
+            boid.Debug.DrawVelocityAndHeading(window);
+            boid.Agent.Draw(window);
         }
 
         _leader.Draw(window);
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 }

@@ -12,7 +12,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.SceneStackDemo;
 /// </summary>
 internal sealed class PauseOverlayScene : GameSceneBase
 {
-    private Font? _font;
+    private Font _font = null!;
 
     public override void Load(GameHost host)
     {
@@ -25,6 +25,7 @@ internal sealed class PauseOverlayScene : GameSceneBase
         if (host.Input.WasKeyPressed(Keyboard.Key.Escape))
         {
             host.PopScene();
+
             return;
         }
 
@@ -39,11 +40,6 @@ internal sealed class PauseOverlayScene : GameSceneBase
             FillColor = new Color(0, 0, 0, 160)
         };
         window.Draw(overlay);
-
-        if (_font is null)
-        {
-            return;
-        }
 
         float cx = host.Window.Size.X / 2f;
         float cy = host.Window.Size.Y / 2f;

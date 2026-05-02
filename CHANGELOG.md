@@ -6,6 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.7.0] - 2026-05-02
+
+### Added
+
+- extra examples to support the README
+
+### Changed
+
+- Interfaces moved namespace GrayHare.GameEngine.Abstractions to GrayHare.GameEngine.
+- Examples refactored and cleaned
+- README rewriten
+
 ## [0.6.2] - 2026-04-26
 
 ### Added

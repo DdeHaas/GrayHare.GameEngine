@@ -18,7 +18,7 @@ internal sealed class ShaderWaveScene : DemoSceneBase
 
     private Sprite? _sprite;
     private Shader? _shader;
-    private Font? _font;
+    private Font _font = null!;
     private Text? _fallbackText;
     private Text? _text;
 
@@ -121,6 +121,7 @@ internal sealed class ShaderWaveScene : DemoSceneBase
         if (_fallbackText is not null)
         {
             window.Draw(_fallbackText);
+
             return;
         }
 

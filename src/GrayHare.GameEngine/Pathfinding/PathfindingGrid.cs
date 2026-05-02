@@ -16,7 +16,7 @@ namespace GrayHare.GameEngine.Pathfinding;
 /// </remarks>
 public sealed class PathfindingGrid
 {
-    private static readonly (int DRow, int DCol)[] Offsets =
+    private static readonly (int DRow, int DCol)[] _offsets =
         [(0, 1), (1, 0), (0, -1), (-1, 0)];
 
     private readonly bool[,] _blocked;
@@ -100,9 +100,10 @@ public sealed class PathfindingGrid
     public void GetWalkableNeighbors(GridCell cell, List<GridCell> results)
     {
         ArgumentNullException.ThrowIfNull(results);
+
         results.Clear();
 
-        foreach ((int dRow, int dCol) in Offsets)
+        foreach ((int dRow, int dCol) in _offsets)
         {
             GridCell neighbor = new(cell.Row + dRow, cell.Column + dCol);
 

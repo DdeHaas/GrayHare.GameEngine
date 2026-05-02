@@ -16,7 +16,7 @@ internal sealed class ShaderPixelateScene : DemoSceneBase
 {
     private Sprite? _sprite;
     private Shader? _shader;
-    private Font? _font;
+    private Font _font = null!;
     private Text? _fallbackText;
 
     public ShaderPixelateScene(DemoCatalog catalog, int sceneIndex)
@@ -58,7 +58,7 @@ internal sealed class ShaderPixelateScene : DemoSceneBase
             return;
         }
 
-        Texture texture = host.Assets.LoadTexture("background.jpg", smooth: true);
+        Texture texture = host.Assets.LoadTexture(Catalog.Assets.BackgroundImagePath, smooth: true);
 
         float x = host.Window.Size.X / 2f - texture.Size.X / 2f;
         float y = host.Window.Size.Y / 2f - texture.Size.Y / 2f;
@@ -94,6 +94,7 @@ internal sealed class ShaderPixelateScene : DemoSceneBase
         if (_fallbackText is not null)
         {
             window.Draw(_fallbackText);
+
             return;
         }
 

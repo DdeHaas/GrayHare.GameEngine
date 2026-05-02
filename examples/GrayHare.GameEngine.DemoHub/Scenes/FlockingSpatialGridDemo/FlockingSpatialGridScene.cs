@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using GrayHare.GameEngine.Behaviors;
 using GrayHare.GameEngine.Extensions;
@@ -27,12 +26,11 @@ internal sealed class FlockingSpatialGridScene : DemoSceneBase
     private const float SeparationRadius = 75f;
     private const float WanderRadius = 25f;
     private const float WanderDistance = 60f;
-    private const float BoundsMargin = 60f;
 
     /// <summary>Bundles an agent with its steering behavior, debug drawer, and per-frame state.</summary>
-    private sealed class GridBoid
+    private sealed class Boid
     {
-        public GridBoid(AutonomousAgent agent)
+        public Boid(AutonomousAgent agent)
         {
             Agent = agent;
             Steering = new SteeringBehavior(agent);
@@ -46,13 +44,13 @@ internal sealed class FlockingSpatialGridScene : DemoSceneBase
     }
 
     private readonly SpatialGrid<AutonomousAgent> _grid = new(CellSize);
-    private readonly List<GridBoid> _boids = [];
+    private readonly List<Boid> _boids = [];
 
     // Reusable buffers to avoid per-frame allocations.
     private readonly List<AutonomousAgent> _neighborBuffer = [];
     private List<IMovableGameObject>[] _neighborCache = [];
 
-    private Font? _font;
+    private Font _font = null!;
     private double _fps;
     private double _updateMs;
 
@@ -79,7 +77,7 @@ internal sealed class FlockingSpatialGridScene : DemoSceneBase
             };
             agent.Velocity = agent.HeadingRef * 140f;
 
-            _boids.Add(new GridBoid(agent) { WanderAngle = angle });
+            _boids.Add(new Boid(agent) { WanderAngle = angle });
         }
 
         _neighborCache = new List<IMovableGameObject>[AgentCount];
@@ -100,7 +98,7 @@ internal sealed class FlockingSpatialGridScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         Vector2f windowSize = new(host.Window.Size.X, host.Window.Size.Y);
         FloatRect bounds = new(new Vector2f(0f, 0f), windowSize);
 
@@ -115,11 +113,13 @@ internal sealed class FlockingSpatialGridScene : DemoSceneBase
         // Query neighbors via the spatial grid and cache for Render.
         for (int i = 0; i < _boids.Count; i++)
         {
+            Boid boid = _boids[i];
+
             _grid.FindNeighbors(
-                _boids[i].Agent.Position,
+                boid.Agent.Position,
                 NeighborhoodRadius,
                 _neighborBuffer,
-                exclude: _boids[i].Agent);
+                exclude: boid.Agent);
 
             _neighborCache[i].Clear();
             for (int n = 0; n < _neighborBuffer.Count; n++)
@@ -131,54 +131,52 @@ internal sealed class FlockingSpatialGridScene : DemoSceneBase
         // Apply steering forces.
         for (int i = 0; i < _boids.Count; i++)
         {
-            GridBoid b = _boids[i];
+            Boid boid = _boids[i];
             IReadOnlyList<IMovableGameObject> neighbors = _neighborCache[i];
 
-            Vector2f wanderForce = b.Steering.Wander(ref b.WanderAngle, WanderRadius, WanderDistance);
-            Vector2f separateForce = b.Steering.Separation(neighbors, SeparationRadius);
-            Vector2f alignForce = b.Steering.Alignment(neighbors);
-            Vector2f cohesionForce = b.Steering.Cohesion(neighbors);
+            Vector2f wanderForce = boid.Steering.Wander(ref boid.WanderAngle, WanderRadius, WanderDistance);
+            Vector2f separateForce = boid.Steering.Separation(neighbors, SeparationRadius);
+            Vector2f alignForce = boid.Steering.Alignment(neighbors);
+            Vector2f cohesionForce = boid.Steering.Cohesion(neighbors);
 
             Vector2f force = SteeringForces.WeightedSum(
-                b.Agent.MaxSpeed,
+                boid.Agent.MaxSpeed,
                 (separateForce, 4f),
                 (alignForce, 3f),
                 (cohesionForce, 2f),
                 (wanderForce, 1f));
 
-            b.Agent.Velocity = (b.Agent.Velocity + (force * dt)).Truncate(b.Agent.MaxSpeed);
-            b.Agent.HeadingRef = b.Steering.UpdateHeadingWhileMoving(dt, ref b.Agent.RotationDegrees);
-            b.Agent.Position = (b.Agent.Position + (b.Agent.Velocity * dt)).WrapPosition(windowSize);
+            boid.Agent.Velocity = (boid.Agent.Velocity + (force * deltaTime)).Truncate(boid.Agent.MaxSpeed);
+            boid.Agent.HeadingRef = boid.Steering.UpdateHeadingWhileMoving(deltaTime, ref boid.Agent.RotationDegrees);
+            boid.Agent.Position = (boid.Agent.Position + (boid.Agent.Velocity * deltaTime)).WrapPosition(windowSize);
         }
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
     public override void RenderLayer(GameHost host, RenderWindow window)
     {
         // Draw the spatial grid cells when debug is enabled.
-        if (SteeringDebugDrawer.Enabled && _font is not null)
+        if (SteeringDebugDrawer.Enabled)
         {
             SteeringDebugDrawer.DrawSpatialGrid(window, _grid, _font);
         }
 
         for (int i = 0; i < _boids.Count; i++)
         {
-            GridBoid b = _boids[i];
-            b.Agent.Draw(window);
+            Boid boid = _boids[i];
+            boid.Agent.Draw(window);
         }
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 
     public override void Unload(GameHost host)
     {
         base.Unload(host);
-        foreach (GridBoid boid in _boids)
+
+        foreach (Boid boid in _boids)
         {
             boid.Debug.Dispose();
             boid.Agent.Dispose();

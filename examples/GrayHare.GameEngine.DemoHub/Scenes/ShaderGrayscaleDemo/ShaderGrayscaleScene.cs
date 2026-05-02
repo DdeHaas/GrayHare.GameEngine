@@ -15,7 +15,7 @@ internal sealed class ShaderGrayscaleScene : DemoSceneBase
 {
     private Sprite? _sprite;
     private Shader? _shader;
-    private Font? _font;
+    private Font _font = null!;
     private Text? _fallbackText;
 
     public ShaderGrayscaleScene(DemoCatalog catalog, int sceneIndex)
@@ -94,6 +94,7 @@ internal sealed class ShaderGrayscaleScene : DemoSceneBase
         if (_fallbackText is not null)
         {
             window.Draw(_fallbackText);
+
             return;
         }
 

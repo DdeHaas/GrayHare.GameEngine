@@ -22,7 +22,7 @@ internal sealed class InterposeScene : DemoSceneBase
     private SteeringDebugDrawer _interposerDebug = null!;
     private float _t1Wander;
     private float _t2Wander;
-    private Font? _font;
+    private Font _font = null!;
     private double _fps;
     private double _updateMs;
 
@@ -61,25 +61,25 @@ internal sealed class InterposeScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         Vector2f size = new(host.Window.Size.X, host.Window.Size.Y);
 
         // Targets wander
-        _target1.Velocity = (_target1.Velocity + (_target1Steering.Wander(ref _t1Wander, 40f, 80f) * dt)).Truncate(_target1.MaxSpeed);
-        _target1.HeadingRef = _target1Steering.UpdateHeadingWhileMoving(dt, ref _target1.RotationDegrees);
-        _target1.Position = (_target1.Position + (_target1.Velocity * dt)).WrapPosition(size);
+        _target1.Velocity = (_target1.Velocity + (_target1Steering.Wander(ref _t1Wander, 40f, 80f) * deltaTime)).Truncate(_target1.MaxSpeed);
+        _target1.HeadingRef = _target1Steering.UpdateHeadingWhileMoving(deltaTime, ref _target1.RotationDegrees);
+        _target1.Position = (_target1.Position + (_target1.Velocity * deltaTime)).WrapPosition(size);
 
-        _target2.Velocity = (_target2.Velocity + (_target2Steering.Wander(ref _t2Wander, 40f, 80f) * dt)).Truncate(_target2.MaxSpeed);
-        _target2.HeadingRef = _target2Steering.UpdateHeadingWhileMoving(dt, ref _target2.RotationDegrees);
-        _target2.Position = (_target2.Position + (_target2.Velocity * dt)).WrapPosition(size);
+        _target2.Velocity = (_target2.Velocity + (_target2Steering.Wander(ref _t2Wander, 40f, 80f) * deltaTime)).Truncate(_target2.MaxSpeed);
+        _target2.HeadingRef = _target2Steering.UpdateHeadingWhileMoving(deltaTime, ref _target2.RotationDegrees);
+        _target2.Position = (_target2.Position + (_target2.Velocity * deltaTime)).WrapPosition(size);
 
         // Interposer
         Vector2f force = _interposerSteering.Interpose(_target1, _target2);
-        _interposer.Velocity = (_interposer.Velocity + (force * dt)).Truncate(_interposer.MaxSpeed);
-        _interposer.HeadingRef = _interposerSteering.UpdateHeadingWhileMoving(dt, ref _interposer.RotationDegrees);
-        _interposer.Position = (_interposer.Position + (_interposer.Velocity * dt)).WrapPosition(size);
+        _interposer.Velocity = (_interposer.Velocity + (force * deltaTime)).Truncate(_interposer.MaxSpeed);
+        _interposer.HeadingRef = _interposerSteering.UpdateHeadingWhileMoving(deltaTime, ref _interposer.RotationDegrees);
+        _interposer.Position = (_interposer.Position + (_interposer.Velocity * deltaTime)).WrapPosition(size);
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -98,9 +98,6 @@ internal sealed class InterposeScene : DemoSceneBase
         line[1] = new Vertex(_target2.Position, new Color(60, 180, 220, 120));
         window.Draw(line);
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 }

@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using SFML.Graphics;
 using SFML.System;
@@ -26,6 +25,8 @@ internal sealed class WaveBackgroundLayer : ISceneLayer
 
     public WaveBackgroundLayer(DemoAssetsManifest assets)
     {
+        ArgumentNullException.ThrowIfNull(assets);
+
         _assets = assets;
     }
 
@@ -93,6 +94,7 @@ internal sealed class WaveBackgroundLayer : ISceneLayer
         if (_fallback is not null)
         {
             window.Draw(_fallback);
+
             return;
         }
 

@@ -20,7 +20,7 @@ internal sealed class HideScene : DemoSceneBase
     private SteeringDebugDrawer _threatDebug = null!;
     private readonly List<ObstacleCircle> _rocks = [];
     private float _threatWander;
-    private Font? _font;
+    private Font _font = null!;
     private double _fps;
     private double _updateMs;
 
@@ -29,6 +29,8 @@ internal sealed class HideScene : DemoSceneBase
     {
         public Hider(AutonomousAgent agent)
         {
+            ArgumentNullException.ThrowIfNull(agent);
+
             Agent = agent;
             Steering = new SteeringBehavior(agent);
             Debug = new SteeringDebugDrawer(agent);
@@ -96,7 +98,7 @@ internal sealed class HideScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         Vector2f windowSize = new(host.Window.Size.X, host.Window.Size.Y);
 
         // Threat wanders and avoids obstacles; obstacle avoidance has highest priority.
@@ -108,9 +110,9 @@ internal sealed class HideScene : DemoSceneBase
             _threat.MaxSpeed,
             (wanderForce, 1f),   // background roaming
             (threatObstacleForce, 2f)); // higher weight: obstacle avoidance dominates
-        _threat.Velocity = (_threat.Velocity + (threatForce * dt)).Truncate(_threat.MaxSpeed);
-        _threat.HeadingRef = _threatSteering.UpdateHeadingWhileMoving(dt, ref _threat.RotationDegrees);
-        _threat.Position = (_threat.Position + (_threat.Velocity * dt)).WrapPosition(windowSize);
+        _threat.Velocity = (_threat.Velocity + (threatForce * deltaTime)).Truncate(_threat.MaxSpeed);
+        _threat.HeadingRef = _threatSteering.UpdateHeadingWhileMoving(deltaTime, ref _threat.RotationDegrees);
+        _threat.Position = (_threat.Position + (_threat.Velocity * deltaTime)).WrapPosition(windowSize);
 
         // Each hider independently hides and avoids obstacles
         foreach (Hider hider in _hiders)
@@ -123,12 +125,12 @@ internal sealed class HideScene : DemoSceneBase
                 hider.Agent.MaxSpeed,
                 (hideForce, 1f),   // seek cover
                 (obstacleForce, 2f));  // higher weight: don't clip through rocks
-            hider.Agent.Velocity = (hider.Agent.Velocity + (hiderForce * dt)).Truncate(hider.Agent.MaxSpeed);
-            hider.Agent.HeadingRef = hider.Steering.UpdateHeadingWhileMoving(dt, ref hider.Agent.RotationDegrees);
-            hider.Agent.Position = (hider.Agent.Position + (hider.Agent.Velocity * dt)).WrapPosition(windowSize);
+            hider.Agent.Velocity = (hider.Agent.Velocity + (hiderForce * deltaTime)).Truncate(hider.Agent.MaxSpeed);
+            hider.Agent.HeadingRef = hider.Steering.UpdateHeadingWhileMoving(deltaTime, ref hider.Agent.RotationDegrees);
+            hider.Agent.Position = (hider.Agent.Position + (hider.Agent.Velocity * deltaTime)).WrapPosition(windowSize);
         }
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -151,9 +153,6 @@ internal sealed class HideScene : DemoSceneBase
         _threatDebug.DrawWander(window, _threatWander, ThreatWanderRadius, ThreatWanderDistance);
         _threat.Draw(window);
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 }

@@ -1,4 +1,5 @@
 using GrayHare.GameEngine.Application;
+using GrayHare.GameEngine.Behaviors;
 using GrayHare.GameEngine.Pathfinding;
 using SFML.Graphics;
 using SFML.System;
@@ -43,7 +44,7 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
     private int _pathIndex;
     private bool _arrived;
     private float _arrivalTimer;
-    private Font? _font;
+    private Font _font = null!;
 
     public PathfindingAgentScene(DemoCatalog catalog, int sceneIndex)
         : base(catalog, sceneIndex)
@@ -77,12 +78,14 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
                 _ => PathfindingAlgorithm.BFS
             };
             RerunPath();
+
             return;
         }
 
         if (host.Input.WasKeyPressed(Keyboard.Key.Space))
         {
             GenerateMaze();
+
             return;
         }
 
@@ -125,11 +128,12 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
 
     // ── Agent movement ───────────────────────────────────────────────────────
 
-    private void MoveAgent(float deltaSeconds)
+    private void MoveAgent(float deltaTime)
     {
         if (_algorithm == PathfindingAlgorithm.FlowField)
         {
-            MoveAgentViaFlowField(deltaSeconds);
+            MoveAgentViaFlowField(deltaTime);
+
             return;
         }
 
@@ -137,6 +141,7 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
         {
             _arrived = true;
             _arrivalTimer = 0f;
+
             return;
         }
 
@@ -158,15 +163,16 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
         }
 
         Vector2f dir = diff / dist;
-        _agentPos += dir * AgentSpeed * deltaSeconds;
+        _agentPos += dir * AgentSpeed * deltaTime;
     }
 
-    private void MoveAgentViaFlowField(float deltaSeconds)
+    private void MoveAgentViaFlowField(float deltaTime)
     {
         if (_flowField is null)
         {
             _arrived = true;
             _arrivalTimer = 0f;
+
             return;
         }
 
@@ -176,6 +182,7 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
         {
             _arrived = true;
             _arrivalTimer = 0f;
+
             return;
         }
 
@@ -185,6 +192,7 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
         {
             _arrived = true;
             _arrivalTimer = 0f;
+
             return;
         }
 
@@ -198,7 +206,7 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
         }
 
         Vector2f dir = diff / dist;
-        _agentPos += dir * AgentSpeed * deltaSeconds;
+        _agentPos += dir * AgentSpeed * deltaTime;
     }
 
     // ── Maze generation ──────────────────────────────────────────────────────
@@ -252,6 +260,7 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
                 : null;
             _agentPos = CellCenter(start.Value);
             _pathIndex = 0;
+
             return;
         }
 
@@ -422,11 +431,6 @@ internal sealed class PathfindingAgentScene : DemoSceneBase
 
     private void DrawHud(RenderWindow window)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         int pathLen = _result?.Path.Count ?? 0;
         int remaining = _result is not null
             ? Math.Max(0, pathLen - _pathIndex)

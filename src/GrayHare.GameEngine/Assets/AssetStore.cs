@@ -57,6 +57,7 @@ public sealed class AssetStore : IDisposable
         if (_images.Remove(resolvedPath, out Image? image))
         {
             image.Dispose();
+
             return;
         }
 
@@ -65,6 +66,7 @@ public sealed class AssetStore : IDisposable
         string[] textureKeysToRemove = _textures.Keys
             .Where(k => k.StartsWith(resolvedPath + "|", StringComparison.OrdinalIgnoreCase))
             .ToArray();
+
         foreach (string key in textureKeysToRemove)
         {
             if (_textures.Remove(key, out Texture? texture))
@@ -82,12 +84,14 @@ public sealed class AssetStore : IDisposable
         if (_fonts.Remove(resolvedPath, out Font? font))
         {
             font.Dispose();
+
             return;
         }
 
         if (_soundBuffers.Remove(resolvedPath, out SoundBuffer? buffer))
         {
             buffer.Dispose();
+
             return;
         }
 
@@ -97,6 +101,7 @@ public sealed class AssetStore : IDisposable
         {
             shader.Dispose();
             _shaderFailures.Remove(resolvedPath);
+
             return;
         }
 
@@ -172,6 +177,7 @@ public sealed class AssetStore : IDisposable
         Image image = img ?? new Image(resolvedPath);
 
         _images[resolvedPath] = image;
+
         return image;
     }
 
@@ -203,6 +209,7 @@ public sealed class AssetStore : IDisposable
 
         texture.Smooth = smooth;
         _textures[cacheKey] = texture;
+
         return texture;
     }
 
@@ -232,6 +239,7 @@ public sealed class AssetStore : IDisposable
 
         Font font = new(resolvedPath);
         _fonts[key] = font;
+
         return font;
     }
 
@@ -251,6 +259,7 @@ public sealed class AssetStore : IDisposable
 
         SoundBuffer buffer = new(resolvedPath);
         _soundBuffers[resolvedPath] = buffer;
+
         return buffer;
     }
 
@@ -282,6 +291,7 @@ public sealed class AssetStore : IDisposable
         // null for the vertex and geometry stages tells SFML to use its built-in pass-through.
         Shader shader = new(null!, null!, fragStream);
         _shaders[resolvedFrag] = shader;
+
         return shader;
     }
 
@@ -322,6 +332,7 @@ public sealed class AssetStore : IDisposable
         // null for the geometry stage tells SFML to omit that pipeline stage.
         Shader shader = new(vertStream, null!, fragStream);
         _shaders[key] = shader;
+
         return shader;
     }
 
@@ -341,16 +352,17 @@ public sealed class AssetStore : IDisposable
         }
 
         return TryLoadShaderCore(
-            resolvedFrag,
             key: resolvedFrag,
             loadShader: () =>
             {
                 using Stream fragStream = File.OpenRead(resolvedFrag);
+
                 return new Shader(null!, null!, fragStream);
             },
             buildFailureReason: ex =>
             {
                 int? required = GlslVersionParser.Parse(File.ReadAllText(resolvedFrag));
+
                 return required is not null
                     ? $"Shader requires GLSL {required}, which is not supported on this GPU."
                     : ex.Message;
@@ -381,12 +393,12 @@ public sealed class AssetStore : IDisposable
         }
 
         return TryLoadShaderCore(
-            resolvedFrag,
             key,
             loadShader: () =>
             {
                 using Stream vertStream = File.OpenRead(resolvedVert);
                 using Stream fragStream = File.OpenRead(resolvedFrag);
+
                 return new Shader(vertStream, null!, fragStream);
             },
             buildFailureReason: ex =>
@@ -408,7 +420,6 @@ public sealed class AssetStore : IDisposable
     /// Checks the success and failure caches before attempting to compile.
     /// </summary>
     private Shader? TryLoadShaderCore(
-        string resolvedFrag,
         string key,
         Func<Shader> loadShader,
         Func<Exception, string> buildFailureReason,
@@ -417,12 +428,14 @@ public sealed class AssetStore : IDisposable
         if (_shaders.TryGetValue(key, out Shader? existing))
         {
             failureReason = null;
+
             return existing;
         }
 
         if (_shaderFailures.TryGetValue(key, out string? cached))
         {
             failureReason = cached;
+
             return null;
         }
 
@@ -431,12 +444,14 @@ public sealed class AssetStore : IDisposable
             Shader shader = loadShader();
             _shaders[key] = shader;
             failureReason = null;
+
             return shader;
         }
         catch (Exception ex)
         {
             failureReason = buildFailureReason(ex);
             _shaderFailures[key] = failureReason;
+
             return null;
         }
     }
@@ -493,15 +508,15 @@ public sealed class AssetStore : IDisposable
         }
 
         // 16×16 checkerboard: 8×8 blocks of magenta (#FF00FF) and black.
-        const uint size = 16;
-        const uint half = size / 2;
-        using Image image = new(new Vector2u(size, size), Color.Black);
+        const uint Size = 16;
+        const uint Half = Size / 2;
+        using Image image = new(new Vector2u(Size, Size), Color.Black);
 
-        for (uint y = 0; y < size; y++)
+        for (uint y = 0; y < Size; y++)
         {
-            for (uint x = 0; x < size; x++)
+            for (uint x = 0; x < Size; x++)
             {
-                bool isMagenta = (x < half) ^ (y < half);
+                bool isMagenta = (x < Half) ^ (y < Half);
                 if (isMagenta)
                 {
                     image.SetPixel(new Vector2u(x, y), new Color(255, 0, 255));
@@ -573,6 +588,7 @@ public sealed class AssetStore : IDisposable
             else if (!char.IsWhiteSpace(c))
             {
                 stream.Position--;
+
                 return;
             }
         }
@@ -581,6 +597,7 @@ public sealed class AssetStore : IDisposable
     private static int ReadPpmInt(Stream stream)
     {
         string token = ReadPpmToken(stream);
+
         return int.Parse(token);
     }
 

@@ -45,6 +45,7 @@ public readonly record struct GameTime(
     {
         float clampedScale = MathF.Max(0f, timeScale);
         TimeSpan scaledDelta = TimeSpan.FromSeconds(rawDelta.TotalSeconds * clampedScale);
+
         return new(
             Total + scaledDelta,
             scaledDelta,

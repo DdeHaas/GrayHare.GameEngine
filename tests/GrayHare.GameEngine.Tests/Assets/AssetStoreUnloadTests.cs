@@ -24,6 +24,7 @@ public sealed class AssetStoreUnloadTests : IDisposable
         // Minimal 1×1 P3 PPM image.
         string path = Path.Combine(_contentRoot, name);
         File.WriteAllText(path, "P3\n1 1\n255\n255 0 0\n");
+
         return name;
     }
 

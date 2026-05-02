@@ -25,7 +25,7 @@ internal sealed class PursueEvadeScene : DemoSceneBase
     private SteeringDebugDrawer _evaderDebug = null!;
 
     private float _evaderWander;
-    private Font? _font;
+    private Font _font = null!;
     private double _fps;
     private double _updateMs;
 
@@ -60,14 +60,14 @@ internal sealed class PursueEvadeScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         Vector2f windowSize = new(host.Window.Size.X, host.Window.Size.Y);
 
         // Pursuer: pursue evader
         Vector2f pursuerForce = _pursuerSteering.Pursue(_evader);
-        _pursuer.Velocity = (_pursuer.Velocity + (pursuerForce * dt)).Truncate(_pursuer.MaxSpeed);
-        _pursuer.HeadingRef = _pursuerSteering.UpdateHeadingWhileMoving(dt, ref _pursuer.RotationDegrees);
-        _pursuer.Position = (_pursuer.Position + (_pursuer.Velocity * dt)).WrapPosition(windowSize);
+        _pursuer.Velocity = (_pursuer.Velocity + (pursuerForce * deltaTime)).Truncate(_pursuer.MaxSpeed);
+        _pursuer.HeadingRef = _pursuerSteering.UpdateHeadingWhileMoving(deltaTime, ref _pursuer.RotationDegrees);
+        _pursuer.Position = (_pursuer.Position + (_pursuer.Velocity * deltaTime)).WrapPosition(windowSize);
 
         // Evader: evade pursuer, wander if far
         float pursuerDistance = (_evader.Position - _pursuer.Position).Length;
@@ -75,11 +75,11 @@ internal sealed class PursueEvadeScene : DemoSceneBase
             ? _evaderSteering.Evade(_pursuer)
             : _evaderSteering.Wander(ref _evaderWander, 50f, 100f);
 
-        _evader.Velocity = (_evader.Velocity + (evaderForce * dt)).Truncate(_evader.MaxSpeed);
-        _evader.HeadingRef = _evaderSteering.UpdateHeadingWhileMoving(dt, ref _evader.RotationDegrees);
-        _evader.Position = (_evader.Position + (_evader.Velocity * dt)).WrapPosition(windowSize);
+        _evader.Velocity = (_evader.Velocity + (evaderForce * deltaTime)).Truncate(_evader.MaxSpeed);
+        _evader.HeadingRef = _evaderSteering.UpdateHeadingWhileMoving(deltaTime, ref _evader.RotationDegrees);
+        _evader.Position = (_evader.Position + (_evader.Velocity * deltaTime)).WrapPosition(windowSize);
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -93,9 +93,6 @@ internal sealed class PursueEvadeScene : DemoSceneBase
         _pursuer.Draw(window);
         _evader.Draw(window);
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 }

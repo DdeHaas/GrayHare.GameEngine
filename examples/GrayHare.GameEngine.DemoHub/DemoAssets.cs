@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Text;
 
 namespace GrayHare.GameEngine.DemoHub;
@@ -40,10 +41,16 @@ internal static class DemoAssets
         File.WriteAllText(blinkFragPath, BlinkFragSource);
         File.WriteAllText(stormVertPath, StormFragSource);
 
+        ReadOnlyCollection<string> explosionTexturePaths = Enumerable.Range(1, 10)
+            .Select(i => $"textures/Explosion_1/Explosion_{i}.png")
+            .ToArray().AsReadOnly();
+
         return new DemoAssetsManifest(
+            "background.jpg",
             Path.GetRelativePath(contentRoot, checkerTexturePath),
             Path.GetRelativePath(contentRoot, spriteSheetPath),
             Path.GetRelativePath(contentRoot, beepSoundPath),
+            "audio/magpiemusic-action-trailer-promo-rock-513687.mp3",
             Path.GetRelativePath(contentRoot, grayscaleFragPath),
             Path.GetRelativePath(contentRoot, waveVertPath),
             Path.GetRelativePath(contentRoot, waveFragPath),
@@ -51,7 +58,8 @@ internal static class DemoAssets
             Path.GetRelativePath(contentRoot, pixelateFragPath),
             Path.GetRelativePath(contentRoot, blurFragPath),
             Path.GetRelativePath(contentRoot, blinkFragPath),
-            Path.GetRelativePath(contentRoot, stormVertPath));
+            Path.GetRelativePath(contentRoot, stormVertPath),
+            explosionTexturePaths);
     }
 
     private static string CreateCheckerPpm(int width, int height)
@@ -149,6 +157,7 @@ internal static class DemoAssets
         }
 
         writer.Flush();
+
         return stream.ToArray();
     }
 

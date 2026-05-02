@@ -22,16 +22,14 @@ internal sealed class ExplosionAnimationScene : DemoSceneBase
     {
         base.Load(host);
 
-        Texture[] textures = Enumerable.Range(1, 10)
-            .Select(i => host.Assets.LoadTexture(
-                $"textures/Explosion_1/Explosion_{i}.png", smooth: true))
+        Texture[] textures = Catalog.Assets.ExplosionTexturePaths
+            .Select(path => host.Assets.LoadTexture(path, smooth: true))
             .ToArray();
 
         _clip = AnimationClip.CreateFromTextures(
             "explosion",
             textures,
             TimeSpan.FromMilliseconds(80));
-
 
         _explosionPlayers.AddRange([
             new AnimationPlayer(_clip!, isLooping: true) { Position = new Vector2f(640f, 360f), Scale = new Vector2f(1.5f, 1.5f), FrameIndex = 0 },

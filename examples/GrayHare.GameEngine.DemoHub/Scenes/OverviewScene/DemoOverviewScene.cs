@@ -10,7 +10,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.OverviewScene;
 /// </summary>
 internal sealed class DemoOverviewScene : DemoSceneBase
 {
-    private Font? _font;
+    private Font _font = null!;
 
     public DemoOverviewScene(DemoCatalog catalog, int sceneIndex)
         : base(catalog, sceneIndex) { }
@@ -23,18 +23,13 @@ internal sealed class DemoOverviewScene : DemoSceneBase
 
     public override void RenderLayer(GameHost host, RenderWindow window)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         DrawHeading(window);
         DrawGroupColumns(window);
     }
 
     private void DrawHeading(RenderWindow window)
     {
-        using Text heading = new(_font!, "GrayHare.GameEngine  –  Demo Index", 26)
+        using Text heading = new(_font, "GrayHare.GameEngine  –  Demo Index", 26)
         {
             Position = new Vector2f(40f, 18f),
             FillColor = new Color(235, 242, 255)
@@ -72,7 +67,7 @@ internal sealed class DemoOverviewScene : DemoSceneBase
             DemoGroup group = groups[g];
 
             // Group header
-            using Text groupHeader = new(_font!, group.Name, 14)
+            using Text groupHeader = new(_font, group.Name, 14)
             {
                 Position = new Vector2f(startX, y),
                 FillColor = new Color(100, 145, 210)
@@ -87,7 +82,7 @@ internal sealed class DemoOverviewScene : DemoSceneBase
                 DemoEntry entry = Catalog.Entries[idx];
                 string line = $"  {idx + 1,2}.  {entry.Title}";
 
-                using Text entryText = new(_font!, line, 13)
+                using Text entryText = new(_font, line, 13)
                 {
                     Position = new Vector2f(startX, y),
                     FillColor = new Color(200, 208, 225)

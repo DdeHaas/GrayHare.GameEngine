@@ -107,6 +107,7 @@ public sealed class GameHost
     public void ChangeScene(GameSceneBase scene)
     {
         ArgumentNullException.ThrowIfNull(scene);
+
         _sceneManager.Queue(scene);
     }
 
@@ -120,6 +121,7 @@ public sealed class GameHost
     public void PushScene(GameSceneBase overlay)
     {
         ArgumentNullException.ThrowIfNull(overlay);
+
         _sceneManager.QueuePush(overlay);
     }
 

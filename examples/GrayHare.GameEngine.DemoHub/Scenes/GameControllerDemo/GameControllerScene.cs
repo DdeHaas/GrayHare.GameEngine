@@ -39,7 +39,7 @@ internal sealed class GameControllerScene : DemoSceneBase
     private static readonly Color _colDim = new(50, 55, 70);
     private static readonly Color _colOutline = new(78, 83, 100);
 
-    private Font? _font;
+    private Font _font = null!;
 
     public GameControllerScene(DemoCatalog catalog, int sceneIndex) : base(catalog, sceneIndex) { }
 
@@ -51,11 +51,6 @@ internal sealed class GameControllerScene : DemoSceneBase
 
     public override void RenderLayer(GameHost host, RenderWindow window)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         bool connected = host.Input.IsJoystickConnected(0);
 
         DrawHeader(window, connected);
@@ -78,7 +73,7 @@ internal sealed class GameControllerScene : DemoSceneBase
         Color statusColor = connected ? new Color(100, 255, 100) : new Color(255, 100, 100);
         float statusX = connected ? 1060f : 990f;
 
-        using Text status = new(_font!, statusText, 20)
+        using Text status = new(_font, statusText, 20)
         {
             Position = new Vector2f(statusX, 22f),
             FillColor = statusColor
@@ -88,7 +83,7 @@ internal sealed class GameControllerScene : DemoSceneBase
 
     private void DrawNotConnected(RenderWindow window)
     {
-        using Text msg = new(_font!,
+        using Text msg = new(_font,
             "Connect a Game controller to joystick port 0.", 20)
         {
             Position = new Vector2f(180f, 290f),
@@ -96,7 +91,7 @@ internal sealed class GameControllerScene : DemoSceneBase
         };
         window.Draw(msg);
 
-        using Text hint = new(_font!,
+        using Text hint = new(_font,
             "Supported drivers:  DsHidMini (recommended)  \u00b7  MotioninJoy  \u00b7  BthPS3", 15)
         {
             Position = new Vector2f(280f, 328f),
@@ -130,7 +125,8 @@ internal sealed class GameControllerScene : DemoSceneBase
         const float GapX = 4f;
         const float StartX = (1280f - 16f * (BoxW + GapX) + GapX) / 2f; // = 144
         const float Y = 143f;
-        using Text heading = new(_font!, "Button IDs  (press a button to see its raw index)", 12)
+
+        using Text heading = new(_font, "Button IDs  (press a button to see its raw index)", 12)
         {
             Position = new Vector2f(StartX, 127f),
             FillColor = new Color(88, 93, 113)
@@ -152,7 +148,7 @@ internal sealed class GameControllerScene : DemoSceneBase
             };
             window.Draw(box);
 
-            using Text lbl = new(_font!, i.ToString(), 13)
+            using Text lbl = new(_font, i.ToString(), 13)
             {
                 Position = new Vector2f(x + BoxW / 2f - (i >= 10 ? 7f : 4f), Y + 3f),
                 FillColor = pressed ? Color.Black : unused ? new Color(62, 65, 80) : new Color(140, 148, 168)
@@ -185,7 +181,7 @@ internal sealed class GameControllerScene : DemoSceneBase
         };
         window.Draw(rect);
 
-        using Text lbl = new(_font!, label, 18)
+        using Text lbl = new(_font, label, 18)
         {
             Position = new Vector2f(x + w / 2f - 10f, y + 6f),
             FillColor = pressed ? Color.White : new Color(160, 168, 188)
@@ -213,7 +209,7 @@ internal sealed class GameControllerScene : DemoSceneBase
         DrawDPadArm(window, cx + Gap, cy - Size / 2f, Size, Size, right, "\u25ba");
         DrawDPadCenter(window, cx - Size / 2f, cy - Size / 2f, Size);
 
-        using Text lbl = new(_font!, "D-Pad", 14)
+        using Text lbl = new(_font, "D-Pad", 14)
         {
             Position = new Vector2f(cx - 20f, cy + Size + Gap + 6f),
             FillColor = new Color(110, 115, 135)
@@ -235,7 +231,7 @@ internal sealed class GameControllerScene : DemoSceneBase
         };
         window.Draw(seg);
 
-        using Text lbl = new(_font!, arrow, 16)
+        using Text lbl = new(_font, arrow, 16)
         {
             Position = new Vector2f(x + w / 2f - 7f, y + h / 2f - 10f),
             FillColor = pressed ? Color.White : new Color(120, 125, 145)
@@ -270,7 +266,7 @@ internal sealed class GameControllerScene : DemoSceneBase
     {
         bool pressed = host.Input.IsJoystickButtonDown(0, button);
 
-        using CircleShape bg = new(r)
+        using CircleShape background = new(r)
         {
             Origin = new Vector2f(r, r),
             Position = new Vector2f(cx, cy),
@@ -278,7 +274,7 @@ internal sealed class GameControllerScene : DemoSceneBase
             OutlineColor = pressed ? pressedColor : _colOutline,
             OutlineThickness = 2f
         };
-        window.Draw(bg);
+        window.Draw(background);
 
         return pressed;
     }
@@ -386,7 +382,7 @@ internal sealed class GameControllerScene : DemoSceneBase
         };
         window.Draw(rect);
 
-        using Text lbl = new(_font!, label, 13)
+        using Text lbl = new(_font, label, 13)
         {
             Position = new Vector2f(cx - label.Length * 3.5f, cy + 4f),
             FillColor = pressed ? new Color(40, 30, 0) : new Color(140, 148, 168)
@@ -408,7 +404,7 @@ internal sealed class GameControllerScene : DemoSceneBase
         };
         window.Draw(circle);
 
-        using Text lbl = new(_font!, "PS", 13)
+        using Text lbl = new(_font, "PS", 13)
         {
             Position = new Vector2f(cx - 9f, cy - 9f),
             FillColor = pressed ? Color.White : new Color(100, 105, 125)
@@ -467,14 +463,14 @@ internal sealed class GameControllerScene : DemoSceneBase
 
         string clickMark = clicked ? " \u25cf" : "";
 
-        using Text nameLbl = new(_font!, label + clickMark, 16)
+        using Text nameLbl = new(_font, label + clickMark, 16)
         {
             Position = new Vector2f(cx - 12f, cy + OuterR + 8f),
             FillColor = clicked ? new Color(255, 200, 60) : new Color(158, 165, 185)
         };
         window.Draw(nameLbl);
 
-        using Text valLbl = new(_font!,
+        using Text valLbl = new(_font,
             $"X:{rawX / 100f:+0.00;-0.00;+0.00}  Y:{rawY / 100f:+0.00;-0.00;+0.00}", 14)
         {
             Position = new Vector2f(cx - 46f, cy + OuterR + 28f),
@@ -502,35 +498,35 @@ internal sealed class GameControllerScene : DemoSceneBase
         float centerX = barX + half;
         bool active = MathF.Abs(norm) > 0.01f;
 
-        using Text leftLbl = new(_font!, labelLeft, 12)
+        using Text leftLbl = new(_font, labelLeft, 12)
         {
             Position = new Vector2f(barX - 24f, y),
             FillColor = norm > 0.01f ? _colActive : new Color(110, 115, 135)
         };
         window.Draw(leftLbl);
 
-        using Text rightLbl = new(_font!, labelRight, 12)
+        using Text rightLbl = new(_font, labelRight, 12)
         {
             Position = new Vector2f(barX + BarW + 6f, y),
             FillColor = norm < -0.01f ? _colActive : new Color(110, 115, 135)
         };
         window.Draw(rightLbl);
 
-        using Text axisLbl = new(_font!, axisName, 11)
+        using Text axisLbl = new(_font, axisName, 11)
         {
             Position = new Vector2f(centerX - 4f, y - 14f),
             FillColor = new Color(88, 93, 113)
         };
         window.Draw(axisLbl);
 
-        using RectangleShape bg = new(new Vector2f(BarW, BarH))
+        using RectangleShape background = new(new Vector2f(BarW, BarH))
         {
             Position = new Vector2f(barX, y + 1f),
             FillColor = _colDim,
             OutlineColor = _colOutline,
             OutlineThickness = 1f
         };
-        window.Draw(bg);
+        window.Draw(background);
 
         using RectangleShape centerTick = new(new Vector2f(1f, BarH))
         {
@@ -552,7 +548,7 @@ internal sealed class GameControllerScene : DemoSceneBase
             window.Draw(filled);
         }
 
-        using Text valText = new(_font!, $"{rawValue:F1}", 12)
+        using Text valText = new(_font, $"{rawValue:F1}", 12)
         {
             Position = new Vector2f(centerX - 12f, y + BarH + 3f),
             FillColor = active ? _colActive : new Color(110, 115, 135)
@@ -562,7 +558,7 @@ internal sealed class GameControllerScene : DemoSceneBase
 
     private void DrawFooter(GameHost host, RenderWindow window, bool connected)
     {
-        using Text legend = new(_font!,
+        using Text legend = new(_font,
             "Btn mapping (confirmed):  " +
             "0:\u00d7  1:\u25cb  2:\u25a1  3:\u25b3  4:L1  5:R1  6:SEL  7:STA  8:L3  9:R3  10:PS  " +
             "\u2502  D-Pad: PovX (L=-100/R=+100)  PovY (U=+100/D=-100)  " +
@@ -590,7 +586,7 @@ internal sealed class GameControllerScene : DemoSceneBase
             host.Input.GetJoystickAxis(0, Joystick.Axis.PovX),
             host.Input.GetJoystickAxis(0, Joystick.Axis.PovY));
 
-        using Text axesText = new(_font!, axes, 14)
+        using Text axesText = new(_font, axes, 14)
         {
             Position = new Vector2f(20f, 585f),
             FillColor = new Color(128, 136, 158)

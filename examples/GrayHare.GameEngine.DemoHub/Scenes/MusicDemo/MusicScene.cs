@@ -12,9 +12,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.MusicDemo;
 /// </summary>
 internal sealed class MusicScene : DemoSceneBase
 {
-    private const string MusicTrackPath = "audio/magpiemusic-action-trailer-promo-rock-513687.mp3";
-
-    private Font? _font;
+    private Font _font = null!;
 
     public MusicScene(DemoCatalog catalog, int sceneIndex) : base(catalog, sceneIndex) { }
 
@@ -25,7 +23,7 @@ internal sealed class MusicScene : DemoSceneBase
         host.Audio.PrewarmSound(Catalog.Assets.BeepSoundPath);
         host.Audio.SetMasterVolume(25f);
         host.Audio.SetMusicVolume(40f);
-        host.Audio.PlayMusic(MusicTrackPath, volume: 100f, loop: true);
+        host.Audio.PlayMusic(Catalog.Assets.MusicTrackPath, volume: 100f, loop: true);
 
         base.Load(host);
     }
@@ -95,18 +93,21 @@ internal sealed class MusicScene : DemoSceneBase
         if (host.Input.WasKeyPressed(Keyboard.Key.Num1))
         {
             host.Audio.SetSfxVolume(33f);
+
             return;
         }
 
         if (host.Input.WasKeyPressed(Keyboard.Key.Num2))
         {
             host.Audio.SetSfxVolume(66f);
+
             return;
         }
 
         if (host.Input.WasKeyPressed(Keyboard.Key.Num3))
         {
             host.Audio.SetSfxVolume(100f);
+
             return;
         }
 
@@ -115,35 +116,30 @@ internal sealed class MusicScene : DemoSceneBase
 
     public override void RenderLayer(GameHost host, RenderWindow window)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         float y = 40f;
-        const float lineHeight = 36f;
+        const float LineHeight = 36f;
 
         string musicStatus = host.Audio.IsMusicPlaying ? "Playing" : "Paused";
         Color musicStatusColor = host.Audio.IsMusicPlaying ? new Color(100, 255, 100) : new Color(255, 220, 60);
         DrawLine(window, $"Music: {musicStatus}", 24, new Vector2f(40f, y), musicStatusColor);
-        y += lineHeight;
+        y += LineHeight;
 
         DrawLine(window, $"Master Volume: {host.Audio.MasterVolume:F0}%", 24, new Vector2f(40f, y), new Color(220, 230, 255));
-        y += lineHeight;
+        y += LineHeight;
 
         DrawLine(window, $"SFX Volume:    {host.Audio.SfxVolume:F0}%", 24, new Vector2f(40f, y), new Color(200, 220, 240));
-        y += lineHeight;
+        y += LineHeight;
 
         DrawLine(window, $"Music Volume:  {host.Audio.MusicVolume:F0}%", 24, new Vector2f(40f, y), new Color(200, 220, 240));
-        y += lineHeight;
+        y += LineHeight;
 
         string mutedState = host.Audio.IsMuted ? "YES" : "NO";
         Color mutedColor = host.Audio.IsMuted ? new Color(255, 100, 100) : new Color(100, 255, 100);
         DrawLine(window, $"Muted: {mutedState}", 24, new Vector2f(40f, y), mutedColor);
-        y += lineHeight;
+        y += LineHeight;
 
         DrawLine(window, $"Active Sounds: {host.Audio.ActiveSoundCount}", 20, new Vector2f(40f, y), new Color(180, 180, 180));
-        y += lineHeight * 2f;
+        y += LineHeight * 2f;
 
         // Volume bar visualization.
         DrawVolumeBar(window, "Master", host.Audio.MasterVolume, new Vector2f(40f, y), new Color(80, 200, 255));
@@ -155,7 +151,7 @@ internal sealed class MusicScene : DemoSceneBase
 
     private void DrawLine(RenderWindow window, string text, uint size, Vector2f position, Color color)
     {
-        using Text line = new(_font!, text, size)
+        using Text line = new(_font, text, size)
         {
             Position = position,
             FillColor = color
@@ -165,11 +161,11 @@ internal sealed class MusicScene : DemoSceneBase
 
     private void DrawVolumeBar(RenderWindow window, string label, float volume, Vector2f position, Color color)
     {
-        const float barWidth = 300f;
-        const float barHeight = 24f;
+        const float BarWidth = 300f;
+        const float BarHeight = 24f;
 
         // Background.
-        using RectangleShape bg = new(new Vector2f(barWidth, barHeight))
+        using RectangleShape bg = new(new Vector2f(BarWidth, BarHeight))
         {
             Position = new Vector2f(position.X + 80f, position.Y),
             FillColor = new Color(40, 40, 50),
@@ -179,8 +175,8 @@ internal sealed class MusicScene : DemoSceneBase
         window.Draw(bg);
 
         // Fill.
-        float fillWidth = barWidth * Math.Clamp(volume, 0f, 100f) / 100f;
-        using RectangleShape fill = new(new Vector2f(fillWidth, barHeight))
+        float fillWidth = BarWidth * Math.Clamp(volume, 0f, 100f) / 100f;
+        using RectangleShape fill = new(new Vector2f(fillWidth, BarHeight))
         {
             Position = new Vector2f(position.X + 80f, position.Y),
             FillColor = color
@@ -188,14 +184,11 @@ internal sealed class MusicScene : DemoSceneBase
         window.Draw(fill);
 
         // Label.
-        if (_font is not null)
+        using Text lbl = new(_font, label, 16)
         {
-            using Text lbl = new(_font, label, 16)
-            {
-                Position = new Vector2f(position.X, position.Y + 2f),
-                FillColor = new Color(200, 200, 200)
-            };
-            window.Draw(lbl);
-        }
+            Position = new Vector2f(position.X, position.Y + 2f),
+            FillColor = new Color(200, 200, 200)
+        };
+        window.Draw(lbl);
     }
 }

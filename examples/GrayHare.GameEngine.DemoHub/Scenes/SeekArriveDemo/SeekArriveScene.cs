@@ -17,7 +17,7 @@ internal sealed class SeekArriveScene : DemoSceneBase
     private readonly SeekArriver _agent = new();
     private readonly SteeringBehavior _steering;
     private readonly SteeringDebugDrawer _debug;
-    private Font? _font;
+    private Font _font = null!;
     private bool _useArrive = true;
     private double _fps;
     private double _updateMs;
@@ -32,6 +32,7 @@ internal sealed class SeekArriveScene : DemoSceneBase
     public override void Load(GameHost host)
     {
         base.Load(host);
+
         _agent.Position = new Vector2f(640f, 360f);
         _agent.HeadingRef = new Vector2f(1f, 0f);
         _agent.RotationDegrees = 0f;
@@ -53,18 +54,18 @@ internal sealed class SeekArriveScene : DemoSceneBase
             _useArrive = !_useArrive;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         Vector2f target = new(host.Input.MousePosition.X, host.Input.MousePosition.Y);
 
         Vector2f force = _useArrive
             ? _steering.Arrive(target, SlowingRadius)
             : _steering.Seek(target);
 
-        _agent.Velocity = (_agent.Velocity + (force * dt)).Truncate(_agent.MaxSpeed);
-        _agent.HeadingRef = _steering.UpdateHeadingWhileMoving(dt, ref _agent.RotationDegrees);
-        _agent.Position += _agent.Velocity * dt;
+        _agent.Velocity = (_agent.Velocity + (force * deltaTime)).Truncate(_agent.MaxSpeed);
+        _agent.HeadingRef = _steering.UpdateHeadingWhileMoving(deltaTime, ref _agent.RotationDegrees);
+        _agent.Position += _agent.Velocity * deltaTime;
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -88,16 +89,13 @@ internal sealed class SeekArriveScene : DemoSceneBase
         using CircleShape cursor = new(6f) { Origin = new(6f, 6f), Position = target, FillColor = Color.Yellow };
         window.Draw(cursor);
 
-        if (_font is not null)
+        string mode = _useArrive ? "Arrive @ Mouse" : "Seek Mouse";
+        using Text hint = new(_font, $"Mode: {mode}", 20)
         {
-            string mode = _useArrive ? "Arrive @ Mouse" : "Seek Mouse";
-            using Text hint = new(_font, $"Mode: {mode}", 20)
-            {
-                Position = new Vector2f(20f, 20f),
-                FillColor = new Color(220, 220, 220)
-            };
-            window.Draw(hint);
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+            Position = new Vector2f(20f, 20f),
+            FillColor = new Color(220, 220, 220)
+        };
+        window.Draw(hint);
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 }

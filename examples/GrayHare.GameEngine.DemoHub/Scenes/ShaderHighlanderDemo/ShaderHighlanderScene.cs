@@ -15,7 +15,7 @@ internal sealed class ShaderHighlanderScene : DemoSceneBase
 {
     private RectangleShape? _canvas;
     private Shader? _shader;
-    private Font? _font;
+    private Font _font = null!;
     private Text? _fallbackText;
 
     public ShaderHighlanderScene(DemoCatalog catalog, int sceneIndex)
@@ -65,6 +65,7 @@ internal sealed class ShaderHighlanderScene : DemoSceneBase
         if (_fallbackText is not null)
         {
             window.Draw(_fallbackText);
+
             return;
         }
 

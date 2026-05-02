@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Extensions;
 using SFML.System;
 
@@ -29,6 +28,7 @@ public sealed class MovementWithRotationBehavior
     public MovementWithRotationBehavior(IMovableGameObject gameObject)
     {
         ArgumentNullException.ThrowIfNull(gameObject);
+
         _gameObject = gameObject;
         _currentSpeed = 0f;
     }

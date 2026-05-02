@@ -17,7 +17,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.TimeScaleDemo;
 /// </summary>
 internal sealed class TimeScaleScene : DemoSceneBase
 {
-    private Font? _font;
+    private Font _font = null!;
 
     // Spinning square angle — driven by scaled Delta so it stops when paused.
     private float _angle;
@@ -86,11 +86,6 @@ internal sealed class TimeScaleScene : DemoSceneBase
         };
         window.Draw(raw);
 
-        if (_font is null)
-        {
-            return;
-        }
-
         string status = host.TimeScale switch
         {
             0f => "PAUSED",
@@ -118,11 +113,6 @@ internal sealed class TimeScaleScene : DemoSceneBase
 
     private void DrawLabel(RenderWindow window, string text, Vector2f position)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         using Text label = new(_font, text, 15)
         {
             Position = position,

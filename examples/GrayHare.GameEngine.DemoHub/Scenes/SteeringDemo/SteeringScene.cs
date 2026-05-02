@@ -16,7 +16,7 @@ internal sealed class SteeringScene : DemoSceneBase
     private readonly SteeringAgent _agent = new();
     private readonly SteeringBehavior _steering;
     private readonly SteeringDebugDrawer _debug;
-    private Font? _font;
+    private Font _font = null!;
     private float _wanderAngle;
     private double _fps;
     private double _updateMs;
@@ -30,6 +30,7 @@ internal sealed class SteeringScene : DemoSceneBase
     public override void Load(GameHost host)
     {
         base.Load(host);
+
         _agent.Position = new Vector2f(640f, 360f);
         _agent.HeadingRef = new Vector2f(1f, 0f);
         _agent.Velocity = _agent.HeadingRef * 50f;
@@ -47,7 +48,7 @@ internal sealed class SteeringScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
 
         Vector2f wanderForce = _steering.Wander(ref _wanderAngle, 60f, 120f);
         FloatRect bounds = new(new Vector2f(0f, 0f), new Vector2f(host.Window.Size.X, host.Window.Size.Y));
@@ -60,13 +61,13 @@ internal sealed class SteeringScene : DemoSceneBase
             (wanderForce, 1f),   // background tendency to keep moving
             (boundsForce, 2f));  // higher weight: bounds always win near edges
 
-        _agent.Velocity += steeringForce * dt;
+        _agent.Velocity += steeringForce * deltaTime;
         _agent.Velocity = _agent.Velocity.Truncate(_agent.MaxSpeed);
-        _agent.HeadingRef = _steering.UpdateHeadingWhileMoving(dt, ref _agent.RotationDegrees);
+        _agent.HeadingRef = _steering.UpdateHeadingWhileMoving(deltaTime, ref _agent.RotationDegrees);
 
-        _agent.Position += _agent.Velocity * dt;
+        _agent.Position += _agent.Velocity * deltaTime;
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -76,9 +77,6 @@ internal sealed class SteeringScene : DemoSceneBase
         _debug.DrawWander(window, _wanderAngle, 60f, 120f);
         _debug.DrawVelocityAndHeading(window);
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 }

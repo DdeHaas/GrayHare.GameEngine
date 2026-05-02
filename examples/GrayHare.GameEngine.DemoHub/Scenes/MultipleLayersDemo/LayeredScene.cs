@@ -18,7 +18,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.MultipleLayersDemo;
 /// </summary>
 internal sealed class LayeredScene : DemoSceneBase
 {
-    private Font? _font;
+    private Font _font = null!;
     private float _ballX;
     private float _ballY;
     private float _velX = 220f;
@@ -62,15 +62,16 @@ internal sealed class LayeredScene : DemoSceneBase
         if (_isGameOver)
         {
             _gameOverLayer!.IsGameOver = true;
+
             return;
         }
 
-        float dt = (float)gameTime.DeltaTotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         float w = host.Window.Size.X;
         float h = host.Window.Size.Y;
 
-        _ballX += _velX * dt;
-        _ballY += _velY * dt;
+        _ballX += _velX * deltaTime;
+        _ballY += _velY * deltaTime;
 
         if (_ballX < BallRadius || _ballX > w - BallRadius)
         {

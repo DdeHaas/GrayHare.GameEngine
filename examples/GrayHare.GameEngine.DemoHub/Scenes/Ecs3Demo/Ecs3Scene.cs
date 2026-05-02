@@ -13,13 +13,15 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.Ecs3Demo;
 /// </summary>
 internal sealed class Ecs3Scene : DemoSceneBase
 {
-    private Font? _font;
+    private const float Radius = 16f;
+    private Font _font = null!;
 
     public Ecs3Scene(DemoCatalog catalog, int sceneIndex) : base(catalog, sceneIndex) { }
 
     public override void Load(GameHost host)
     {
         base.Load(host);
+
         _font = host.Assets.LoadFont();
 
         Random random = Random.Shared;
@@ -39,7 +41,7 @@ internal sealed class Ecs3Scene : DemoSceneBase
     {
         base.Update(host, in gameTime);
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         float w = host.Window.Size.X;
         float h = host.Window.Size.Y;
 
@@ -50,7 +52,7 @@ internal sealed class Ecs3Scene : DemoSceneBase
             Velocity vel = host.World.GetComponent<Velocity>(e);
             Health hp = host.World.GetComponent<Health>(e);
 
-            Vector2f newPos = pos.Value + vel.Value * dt;
+            Vector2f newPos = pos.Value + vel.Value * deltaTime;
 
             // Bounce off window edges.
             Vector2f newVel = vel.Value;
@@ -67,7 +69,7 @@ internal sealed class Ecs3Scene : DemoSceneBase
             }
 
             // Health drains at 5 HP/s — the 3-component query is the only place this happens.
-            float newHp = Math.Max(0f, hp.Value - 5f * dt);
+            float newHp = Math.Max(0f, hp.Value - 5f * deltaTime);
 
             host.World.AddComponent(e, new Position(newPos));
             host.World.AddComponent(e, new Velocity(newVel));
@@ -77,10 +79,10 @@ internal sealed class Ecs3Scene : DemoSceneBase
 
     public override void RenderLayer(GameHost host, RenderWindow window)
     {
-        foreach (Entity e in host.World.Query<Position, Health>())
+        foreach (Entity entity in host.World.Query<Position, Health>())
         {
-            Position pos = host.World.GetComponent<Position>(e);
-            Health hp = host.World.GetComponent<Health>(e);
+            Position pos = host.World.GetComponent<Position>(entity);
+            Health hp = host.World.GetComponent<Health>(entity);
 
             // Colour shifts from green (full health) to red (zero health).
             byte red = (byte)(255 * (1f - hp.Value / 100f));
@@ -94,22 +96,17 @@ internal sealed class Ecs3Scene : DemoSceneBase
                 OutlineColor = new Color(220, 220, 220),
                 OutlineThickness = 1f
             };
+
             window.Draw(shape);
         }
 
-        if (_font is not null)
+        using Text hint = new(_font, "ECS 3-component query  –  balls drain from green→red over time", 18)
         {
-            using Text hint = new(_font,
-                "ECS 3-component query  –  balls drain from green→red over time", 18)
-            {
-                Position = new Vector2f(20f, 20f),
-                FillColor = new Color(200, 200, 200)
-            };
-            window.Draw(hint);
-        }
+            Position = new Vector2f(20f, 20f),
+            FillColor = new Color(200, 200, 200)
+        };
+        window.Draw(hint);
     }
-
-    private const float Radius = 16f;
 
     private readonly record struct Position(Vector2f Value);
     private readonly record struct Velocity(Vector2f Value);

@@ -11,7 +11,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.SceneStackDemo;
 /// </summary>
 internal sealed class SceneStackScene : DemoSceneBase
 {
-    private Font? _font;
+    private Font _font = null!;
     private float _ballX;
     private float _ballY;
     private float _velX = 180f;
@@ -24,6 +24,7 @@ internal sealed class SceneStackScene : DemoSceneBase
     public override void Load(GameHost host)
     {
         base.Load(host);
+
         _font = host.Assets.LoadFont();
         _ballX = host.Window.Size.X / 2f;
         _ballY = host.Window.Size.Y / 2f;
@@ -45,10 +46,10 @@ internal sealed class SceneStackScene : DemoSceneBase
 
         base.Update(host, in gameTime);
 
-        float dt = gameTime.DeltaTotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
 
         // Increment score every second.
-        _scoreTimer += dt;
+        _scoreTimer += deltaTime;
         if (_scoreTimer >= 1f)
         {
             _scoreTimer -= 1f;
@@ -60,8 +61,8 @@ internal sealed class SceneStackScene : DemoSceneBase
         float maxX = host.Window.Size.X - radius;
         float maxY = host.Window.Size.Y - radius;
 
-        _ballX += _velX * dt;
-        _ballY += _velY * dt;
+        _ballX += _velX * deltaTime;
+        _ballY += _velY * deltaTime;
 
         if (_ballX < radius || _ballX > maxX)
         {
@@ -86,11 +87,6 @@ internal sealed class SceneStackScene : DemoSceneBase
             FillColor = new Color(80, 200, 255)
         };
         window.Draw(ball);
-
-        if (_font is null)
-        {
-            return;
-        }
 
         using Text scoreText = new(_font, $"Score: {_score}", 26)
         {

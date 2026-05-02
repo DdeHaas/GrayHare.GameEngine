@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using GrayHare.GameEngine.Extensions;
 using SFML.Graphics;
@@ -20,6 +19,8 @@ internal sealed class PauseLayer : ISceneLayer
 
     public PauseLayer(Font font)
     {
+        ArgumentNullException.ThrowIfNull(font);
+
         _font = font;
     }
 

@@ -66,7 +66,5 @@ internal sealed class AudioScene : DemoSceneBase
 
             window.Draw(shape);
         }
-
-
     }
 }

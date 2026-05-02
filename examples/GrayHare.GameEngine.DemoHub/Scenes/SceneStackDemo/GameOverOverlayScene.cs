@@ -12,7 +12,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.SceneStackDemo;
 /// </summary>
 internal sealed class GameOverOverlayScene : GameSceneBase
 {
-    private Font? _font;
+    private Font _font = null!;
 
     public override void Load(GameHost host)
     {
@@ -39,11 +39,6 @@ internal sealed class GameOverOverlayScene : GameSceneBase
             FillColor = new Color(120, 0, 0, 140)
         };
         window.Draw(overlay);
-
-        if (_font is null)
-        {
-            return;
-        }
 
         float cx = host.Window.Size.X / 2f;
         float cy = host.Window.Size.Y / 2f;

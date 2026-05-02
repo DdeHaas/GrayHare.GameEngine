@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Behaviors;
 using SFML.Graphics;
 using SFML.System;
@@ -71,7 +70,7 @@ public sealed class MovementBehaviorTests
         };
         var behavior = new MovementBehavior(obj) { IsMovingForwards = true };
 
-        Vector2f velocity = behavior.UpdateMovement(1f, Constants.Vectors.Zero, obj.Position);
+        Vector2f velocity = behavior.UpdateMovement(1f, Constants.Vectors.Zero);
 
         Assert.True(velocity.Length > 0f);
     }
@@ -88,7 +87,7 @@ public sealed class MovementBehaviorTests
         };
         var behavior = new MovementBehavior(obj) { IsMovingForwards = true };
 
-        Vector2f velocity = behavior.UpdateMovement(10f, Constants.Vectors.Zero, obj.Position);
+        Vector2f velocity = behavior.UpdateMovement(10f, Constants.Vectors.Zero);
 
         Assert.True(velocity.Length <= 100f + float.Epsilon);
     }
@@ -106,7 +105,7 @@ public sealed class MovementBehaviorTests
         var behavior = new MovementBehavior(obj);
 
         Vector2f start = new(100f, 0f);
-        Vector2f velocity = behavior.UpdateMovement(1f, start, obj.Position);
+        Vector2f velocity = behavior.UpdateMovement(1f, start);
 
         Assert.True(velocity.Length < start.Length);
     }

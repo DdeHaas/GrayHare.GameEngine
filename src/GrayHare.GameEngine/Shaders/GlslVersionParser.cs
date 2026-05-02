@@ -24,6 +24,7 @@ public static class GlslVersionParser
     public static int? Parse(string shaderSource)
     {
         Match match = _versionDirective.Match(shaderSource);
+
         return match.Success && int.TryParse(match.Groups[1].Value, out int version)
             ? version
             : null;

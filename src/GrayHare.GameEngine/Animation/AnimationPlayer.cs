@@ -166,6 +166,7 @@ public sealed class AnimationPlayer : IDisposable
 
                 IsFinished = true;
                 _frameElapsed = TimeSpan.Zero;
+
                 return;
             }
 

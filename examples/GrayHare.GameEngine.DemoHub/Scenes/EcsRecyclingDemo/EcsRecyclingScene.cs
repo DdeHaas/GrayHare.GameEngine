@@ -11,7 +11,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.EcsRecyclingDemo;
 /// </summary>
 internal sealed class EcsRecyclingScene : DemoSceneBase
 {
-    private Font? _font;
+    private Font _font = null!;
     private float _spawnTimer;
     private int _maxEntityIdSeen;
     private bool _recyclingDetected;
@@ -30,12 +30,12 @@ internal sealed class EcsRecyclingScene : DemoSceneBase
     {
         base.Update(host, in gameTime);
 
-        float dt = gameTime.DeltaTotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         float w = host.Window.Size.X;
         float h = host.Window.Size.Y;
 
         // Spawn entities periodically.
-        _spawnTimer += dt;
+        _spawnTimer += deltaTime;
         if (_spawnTimer >= 0.5f)
         {
             _spawnTimer -= 0.5f;
@@ -52,8 +52,8 @@ internal sealed class EcsRecyclingScene : DemoSceneBase
         {
             Position newPos = pos with
             {
-                X = pos.X + vel.Vx * dt,
-                Y = pos.Y + vel.Vy * dt
+                X = pos.X + vel.Vx * deltaTime,
+                Y = pos.Y + vel.Vy * deltaTime
             };
             host.World.AddComponent(entity, newPos);
 
@@ -87,11 +87,6 @@ internal sealed class EcsRecyclingScene : DemoSceneBase
                 FillColor = new Color(tint.R, tint.G, tint.B)
             };
             window.Draw(shape);
-        }
-
-        if (_font is null)
-        {
-            return;
         }
 
         string recycleLabel = _recyclingDetected

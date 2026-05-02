@@ -13,10 +13,7 @@ public static class AssetPathResolver
     /// </exception>
     public static string NormalizeContentRoot(string contentRoot)
     {
-        if (string.IsNullOrWhiteSpace(contentRoot))
-        {
-            throw new ArgumentException("Content root must not be empty.", nameof(contentRoot));
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(contentRoot);
 
         return Path.GetFullPath(contentRoot);
     }
@@ -28,12 +25,9 @@ public static class AssetPathResolver
     /// <exception cref="ArgumentException">Thrown when <paramref name="assetPath"/> is null or whitespace.</exception>
     public static string ResolvePath(string contentRoot, string assetPath)
     {
-        if (string.IsNullOrWhiteSpace(assetPath))
-        {
-            throw new ArgumentException("Asset path must not be empty.", nameof(assetPath));
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(assetPath);
 
-        string fullPath = Path.IsPathRooted(assetPath)
+        string fullPath= Path.IsPathRooted(assetPath)
             ? Path.GetFullPath(assetPath)
             : Path.GetFullPath(Path.Combine(NormalizeContentRoot(contentRoot), assetPath));
 

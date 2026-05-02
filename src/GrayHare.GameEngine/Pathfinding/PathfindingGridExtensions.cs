@@ -1,3 +1,4 @@
+using GrayHare.GameEngine.Behaviors;
 using SFML.System;
 
 namespace GrayHare.GameEngine.Pathfinding;

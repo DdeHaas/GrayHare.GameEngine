@@ -37,7 +37,7 @@ internal sealed class EcsScene : DemoSceneBase
         base.Update(host, in gameTime);
 
         Vector2f bounds = new(host.Window.Size.X - 30f, host.Window.Size.Y - 30f);
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
 
         foreach (Entity entity in host.World.Query<Position, Velocity>())
         {
@@ -47,8 +47,8 @@ internal sealed class EcsScene : DemoSceneBase
             position = position with
             {
                 Value = new Vector2f(
-                    position.Value.X + velocity.Value.X * dt,
-                    position.Value.Y + velocity.Value.Y * dt)
+                    position.Value.X + velocity.Value.X * deltaTime,
+                    position.Value.Y + velocity.Value.Y * deltaTime)
             };
 
             if (position.Value.X < 30f || position.Value.X > bounds.X)

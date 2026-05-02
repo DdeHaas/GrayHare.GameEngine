@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using GrayHare.GameEngine.Behaviors;
 using SFML.Graphics;
@@ -20,6 +19,9 @@ internal sealed class ComboHudLayer : ISceneLayer
 
     public ComboHudLayer(Font font, ComboFlockLayer flockLayer)
     {
+        ArgumentNullException.ThrowIfNull(font);
+        ArgumentNullException.ThrowIfNull(flockLayer);
+
         _font = font;
         _flockLayer = flockLayer;
     }

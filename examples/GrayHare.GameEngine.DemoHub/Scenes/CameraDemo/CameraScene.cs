@@ -15,7 +15,7 @@ internal sealed class CameraScene : DemoSceneBase
     private const float PlayerSize = 24f;
     private const float MoveSpeed = 200f;
 
-    private Font? _font;
+    private Font _font = null!;
     private Vector2f _playerPos = new(WorldSize / 2f, WorldSize / 2f);
 
     public CameraScene(DemoCatalog catalog, int sceneIndex) : base(catalog, sceneIndex) { }
@@ -23,6 +23,7 @@ internal sealed class CameraScene : DemoSceneBase
     public override void Load(GameHost host)
     {
         base.Load(host);
+
         _font = host.Assets.LoadFont();
         host.Camera.Position = _playerPos;
     }
@@ -37,7 +38,7 @@ internal sealed class CameraScene : DemoSceneBase
     {
         base.Update(host, in gameTime);
 
-        float dt = gameTime.DeltaTotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
 
         // Player movement with WASD.
         Vector2f move = new(0f, 0f);
@@ -65,7 +66,7 @@ internal sealed class CameraScene : DemoSceneBase
         float len = MathF.Sqrt(move.X * move.X + move.Y * move.Y);
         if (len > 0f)
         {
-            _playerPos += move / len * MoveSpeed * dt;
+            _playerPos += move / len * MoveSpeed * deltaTime;
         }
 
         // Clamp to world bounds.
@@ -76,12 +77,12 @@ internal sealed class CameraScene : DemoSceneBase
         // Zoom control.
         if (host.Input.IsKeyDown(Keyboard.Key.Z))
         {
-            host.Camera.Zoom += 0.5f * dt;
+            host.Camera.Zoom += 0.5f * deltaTime;
         }
 
         if (host.Input.IsKeyDown(Keyboard.Key.X))
         {
-            host.Camera.Zoom = MathF.Max(0.1f, host.Camera.Zoom - 0.5f * dt);
+            host.Camera.Zoom = MathF.Max(0.1f, host.Camera.Zoom - 0.5f * deltaTime);
         }
 
         // Screen shake.
@@ -90,7 +91,7 @@ internal sealed class CameraScene : DemoSceneBase
             host.Camera.Shake(8f, 0.4f);
         }
 
-        host.Camera.Follow(_playerPos, 4f, dt);
+        host.Camera.Follow(_playerPos, 4f, deltaTime);
         host.Camera.UpdateShake(gameTime.RawDeltaTotalSeconds);
     }
 
@@ -136,11 +137,6 @@ internal sealed class CameraScene : DemoSceneBase
 
         // Reset view for HUD.
         window.SetView(window.DefaultView);
-
-        if (_font is null)
-        {
-            return;
-        }
 
         using Text hud = new(_font,
             $"Pos: ({_playerPos.X:F0}, {_playerPos.Y:F0})  Zoom: {host.Camera.Zoom:F2}", 18)

@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using GrayHare.GameEngine.Behaviors;
 using GrayHare.GameEngine.Extensions;
@@ -46,7 +45,7 @@ internal sealed class FlockingScene : DemoSceneBase
     // Neighbor lists populated each Update and reused in Render for debug drawing.
     private List<IMovableGameObject>[] _neighborCache = [];
 
-    private Font? _font;
+    private Font _font = null!;
     private double _fps;
     private double _updateMs;
 
@@ -94,7 +93,7 @@ internal sealed class FlockingScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         Vector2f windowSize = new(host.Window.Size.X, host.Window.Size.Y);
 
         // Build neighbor lists from positions at the START of this frame so all
@@ -120,28 +119,29 @@ internal sealed class FlockingScene : DemoSceneBase
 
         for (int i = 0; i < _boids.Count; i++)
         {
-            Boid b = _boids[i];
+            Boid boid = _boids[i];
+
             IReadOnlyList<IMovableGameObject> neighbors = _neighborCache[i];
 
-            Vector2f wanderForce = b.Steering.Wander(ref b.WanderAngle, WanderRadius, WanderDistance);
-            Vector2f cohesionForce = b.Steering.Cohesion(neighbors);
-            Vector2f alignForce = b.Steering.Alignment(neighbors);
-            Vector2f separateForce = b.Steering.Separation(neighbors, SeparationRadius);
+            Vector2f wanderForce = boid.Steering.Wander(ref boid.WanderAngle, WanderRadius, WanderDistance);
+            Vector2f cohesionForce = boid.Steering.Cohesion(neighbors);
+            Vector2f alignForce = boid.Steering.Alignment(neighbors);
+            Vector2f separateForce = boid.Steering.Separation(neighbors, SeparationRadius);
 
             // Weighted blend: separation prevents overlap, alignment and cohesion maintain flock structure.
             Vector2f force = SteeringForces.WeightedSum(
-                b.Agent.MaxSpeed,
+                boid.Agent.MaxSpeed,
                 (separateForce, 4f),   // highest weight: personal space is non-negotiable
                 (alignForce, 3f),
                 (cohesionForce, 2f),
                 (wanderForce, 1f));     // lowest weight: gentle tendency to keep moving
 
-            b.Agent.Velocity = (b.Agent.Velocity + (force * dt)).Truncate(b.Agent.MaxSpeed);
-            b.Agent.HeadingRef = b.Steering.UpdateHeadingWhileMoving(dt, ref b.Agent.RotationDegrees);
-            b.Agent.Position = (b.Agent.Position + (b.Agent.Velocity * dt)).WrapPosition(windowSize);
+            boid.Agent.Velocity = (boid.Agent.Velocity + (force * deltaTime)).Truncate(boid.Agent.MaxSpeed);
+            boid.Agent.HeadingRef = boid.Steering.UpdateHeadingWhileMoving(deltaTime, ref boid.Agent.RotationDegrees);
+            boid.Agent.Position = (boid.Agent.Position + (boid.Agent.Velocity * deltaTime)).WrapPosition(windowSize);
         }
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -149,20 +149,17 @@ internal sealed class FlockingScene : DemoSceneBase
     {
         for (int i = 0; i < _boids.Count; i++)
         {
-            Boid b = _boids[i];
+            Boid boid = _boids[i];
             IReadOnlyList<IMovableGameObject> neighbors = _neighborCache[i];
 
-            b.Debug.DrawNeighborhood(window, neighbors, NeighborhoodRadius);
-            b.Debug.DrawSeparation(window, neighbors, SeparationRadius);
-            b.Debug.DrawAlignment(window, neighbors);
-            b.Debug.DrawCohesion(window, neighbors);
-            b.Debug.DrawVelocityAndHeading(window);
-            b.Agent.Draw(window);
+            boid.Debug.DrawNeighborhood(window, neighbors, NeighborhoodRadius);
+            boid.Debug.DrawSeparation(window, neighbors, SeparationRadius);
+            boid.Debug.DrawAlignment(window, neighbors);
+            boid.Debug.DrawCohesion(window, neighbors);
+            boid.Debug.DrawVelocityAndHeading(window);
+            boid.Agent.Draw(window);
         }
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 }

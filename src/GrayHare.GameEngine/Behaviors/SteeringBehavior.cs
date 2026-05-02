@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Extensions;
 using SFML.Graphics;
 using SFML.System;
@@ -19,6 +18,7 @@ public sealed class SteeringBehavior
     public SteeringBehavior(IMovableGameObject gameObject)
     {
         ArgumentNullException.ThrowIfNull(gameObject);
+
         _gameObject = gameObject;
     }
 
@@ -29,6 +29,7 @@ public sealed class SteeringBehavior
     {
         Vector2f desiredVelocity =
             (targetPosition - _gameObject.Position).Normalized() * _gameObject.MaxSpeed;
+
         return desiredVelocity - _gameObject.Velocity;
     }
 
@@ -37,6 +38,7 @@ public sealed class SteeringBehavior
     {
         Vector2f desiredVelocity =
             (_gameObject.Position - targetPosition).Normalized() * _gameObject.MaxSpeed;
+
         return desiredVelocity - _gameObject.Velocity;
     }
 
@@ -61,6 +63,7 @@ public sealed class SteeringBehavior
             : _gameObject.MaxSpeed;
 
         Vector2f desiredVelocity = toTarget.Normalized() * desiredSpeed;
+
         return desiredVelocity - _gameObject.Velocity;
     }
 
@@ -78,6 +81,7 @@ public sealed class SteeringBehavior
         }
 
         float lookAheadTime = toTarget.Length / (_gameObject.MaxSpeed + target.Speed);
+
         return Seek(target.Position + (target.Velocity * lookAheadTime));
     }
 
@@ -86,6 +90,7 @@ public sealed class SteeringBehavior
     {
         Vector2f toTarget = target.Position - _gameObject.Position;
         float lookAheadTime = toTarget.Length / (_gameObject.MaxSpeed + target.Speed);
+
         return Flee(target.Position + (target.Velocity * lookAheadTime));
     }
 
@@ -104,6 +109,7 @@ public sealed class SteeringBehavior
         Vector2f circleCenter = _gameObject.Heading.Normalized() * wanderDistance;
         Vector2f displacement =
             new Vector2f(MathF.Cos(wanderAngle), MathF.Sin(wanderAngle)) * wanderRadius;
+
         return (circleCenter + displacement) - _gameObject.Velocity;
     }
 
@@ -244,6 +250,7 @@ public sealed class SteeringBehavior
         }
 
         float overshoot = closestFeelerLength * (1f - closestT);
+
         return closestNormal * (overshoot / closestFeelerLength) * _gameObject.MaxSpeed;
     }
 
@@ -399,6 +406,7 @@ public sealed class SteeringBehavior
             FloatRect size = _gameObject.GlobalBounds;
             float agentRadius = MathF.Max(size.Width, size.Height) / 2f;
             pathToFollowIndex++;
+
             return Arrive(waypoint, agentRadius);
         }
 
@@ -463,6 +471,7 @@ public sealed class SteeringBehavior
         }
 
         Vector2f desired = (avgHeading / (float)neighbors.Count).Normalized() * _gameObject.MaxSpeed;
+
         return desired - _gameObject.Velocity;
     }
 
@@ -522,6 +531,7 @@ public sealed class SteeringBehavior
             (_gameObject.Heading.X * sin) + (_gameObject.Heading.Y * cos)).Normalized();
 
         rotation = heading.Angle().WrapUnsigned().Degrees;
+
         return heading;
     }
 

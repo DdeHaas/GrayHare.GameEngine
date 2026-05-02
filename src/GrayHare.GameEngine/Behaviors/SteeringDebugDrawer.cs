@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Extensions;
 using SFML.Graphics;
 using SFML.System;
@@ -32,6 +31,7 @@ public sealed class SteeringDebugDrawer : IDisposable
     public SteeringDebugDrawer(IMovableGameObject gameObject)
     {
         ArgumentNullException.ThrowIfNull(gameObject);
+
         _gameObject = gameObject;
     }
 
@@ -646,6 +646,7 @@ public sealed class SteeringDebugDrawer : IDisposable
     {
         Vector2f toTarget = target.Position - _gameObject.Position;
         float lookAheadTime = toTarget.Length / (_gameObject.MaxSpeed + target.Speed);
+
         return target.Position + (target.Velocity * lookAheadTime);
     }
 

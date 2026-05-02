@@ -10,7 +10,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.AssetFallbackDemo;
 /// </summary>
 internal sealed class AssetFallbackScene : DemoSceneBase
 {
-    private Font? _font;
+    private Font _font = null!;
     private Texture? _validTexture;
     private Texture? _missingTexture;
 
@@ -55,11 +55,6 @@ internal sealed class AssetFallbackScene : DemoSceneBase
                 Scale = new Vector2f(spriteScale * 3f, spriteScale * 3f)
             };
             window.Draw(missingSprite);
-        }
-
-        if (_font is null)
-        {
-            return;
         }
 
         // Labels.

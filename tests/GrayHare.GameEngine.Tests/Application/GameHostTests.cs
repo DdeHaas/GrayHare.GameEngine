@@ -25,6 +25,7 @@ public sealed class GameHostTests
         typeof(GameHost)
             .GetField("_sceneManager", BindingFlags.NonPublic | BindingFlags.Instance)!
             .SetValue(host, sceneManager);
+
         return host;
     }
 

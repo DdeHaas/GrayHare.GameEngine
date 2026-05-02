@@ -47,6 +47,7 @@ public sealed class SceneManager
     public void Queue(GameSceneBase scene)
     {
         ArgumentNullException.ThrowIfNull(scene);
+
         _pendingOps.Enqueue(new PendingOperation(OperationType.Change, scene));
     }
 
@@ -59,6 +60,7 @@ public sealed class SceneManager
     public void QueuePush(GameSceneBase overlay)
     {
         ArgumentNullException.ThrowIfNull(overlay);
+
         _pendingOps.Enqueue(new PendingOperation(OperationType.Push, overlay));
     }
 

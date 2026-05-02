@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using SFML.System;
 
 namespace GrayHare.GameEngine.Behaviors;
@@ -24,6 +23,7 @@ public sealed class MovementBehavior
     public MovementBehavior(IMovableGameObject gameObject)
     {
         ArgumentNullException.ThrowIfNull(gameObject);
+
         _gameObject = gameObject;
     }
 
@@ -51,10 +51,7 @@ public sealed class MovementBehavior
     /// </summary>
     /// <param name="deltaTime">Elapsed seconds since the last frame.</param>
     /// <param name="currentVelocity">Velocity from the previous frame.</param>
-    /// <param name="currentPosition">
-    /// Position from the previous frame (unused internally, passed for extensibility).
-    /// </param>
-    public Vector2f UpdateMovement(float deltaTime, Vector2f currentVelocity, Vector2f currentPosition)
+    public Vector2f UpdateMovement(float deltaTime, Vector2f currentVelocity)
     {
         float mass = MathF.Max(_gameObject.Mass, float.Epsilon);
 

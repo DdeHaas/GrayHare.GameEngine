@@ -14,6 +14,8 @@ internal abstract class DemoSceneBase : GameSceneBase
 {
     protected DemoSceneBase(DemoCatalog catalog, int sceneIndex)
     {
+        ArgumentNullException.ThrowIfNull(catalog);
+
         Catalog = catalog;
         SceneIndex = sceneIndex;
         AddLayer(new HubLayer(catalog, sceneIndex));
@@ -52,20 +54,6 @@ internal abstract class DemoSceneBase : GameSceneBase
             host.Input.WasKeyPressed(Keyboard.Key.Hyphen))
         {
             host.ChangeScene(Catalog.Create(SceneIndex - 1));
-            return;
-        }
-
-        // PageDown → first scene of next group
-        if (host.Input.WasKeyPressed(Keyboard.Key.PageDown))
-        {
-            host.ChangeScene(Catalog.Create(Catalog.FirstIndexOfNextGroup(SceneIndex)));
-            return;
-        }
-
-        // PageUp → first scene of previous group (or start of current group)
-        if (host.Input.WasKeyPressed(Keyboard.Key.PageUp))
-        {
-            host.ChangeScene(Catalog.Create(Catalog.FirstIndexOfPreviousGroup(SceneIndex)));
             return;
         }
 

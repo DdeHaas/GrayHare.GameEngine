@@ -40,7 +40,8 @@ public static class VectorExtensions
     /// </summary>
     public static Vector2f WrapPosition(this Vector2f position, Vector2u size)
     {
-        var vectorSize = new Vector2f(size.X, size.Y);
+        Vector2f vectorSize = new(size.X, size.Y);
+
         return WrapPosition(position, vectorSize);
     }
 }

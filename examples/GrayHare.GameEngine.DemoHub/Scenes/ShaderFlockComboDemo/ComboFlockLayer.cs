@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using GrayHare.GameEngine.Behaviors;
 using GrayHare.GameEngine.Extensions;
@@ -28,6 +27,8 @@ internal sealed class ComboFlockLayer : ISceneLayer
     {
         public Boid(AutonomousAgent agent)
         {
+            ArgumentNullException.ThrowIfNull(agent);
+
             Agent = agent;
             Steering = new SteeringBehavior(agent);
             Debug = new SteeringDebugDrawer(agent);
@@ -101,7 +102,7 @@ internal sealed class ComboFlockLayer : ISceneLayer
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         Vector2f windowSize = new(host.Window.Size.X, host.Window.Size.Y);
 
         // Snapshot neighbor lists from current positions so all boids
@@ -127,28 +128,28 @@ internal sealed class ComboFlockLayer : ISceneLayer
 
         for (int i = 0; i < _boids.Count; i++)
         {
-            Boid b = _boids[i];
+            Boid boid = _boids[i];
             IReadOnlyList<IMovableGameObject> neighbors = _neighborCache[i];
 
-            Vector2f wanderForce = b.Steering.Wander(ref b.WanderAngle, WanderRadius, WanderDistance);
-            Vector2f separateForce = b.Steering.Separation(neighbors, SeparationRadius);
-            Vector2f alignForce = b.Steering.Alignment(neighbors);
-            Vector2f cohesionForce = b.Steering.Cohesion(neighbors);
+            Vector2f wanderForce = boid.Steering.Wander(ref boid.WanderAngle, WanderRadius, WanderDistance);
+            Vector2f separateForce = boid.Steering.Separation(neighbors, SeparationRadius);
+            Vector2f alignForce = boid.Steering.Alignment(neighbors);
+            Vector2f cohesionForce = boid.Steering.Cohesion(neighbors);
 
             // Weighted blend: separation has highest priority to prevent clumping.
             Vector2f force = SteeringForces.WeightedSum(
-                b.Agent.MaxSpeed,
+                boid.Agent.MaxSpeed,
                 (separateForce, 4f),
                 (alignForce, 3f),
                 (cohesionForce, 2f),
                 (wanderForce, 1f));
 
-            b.Agent.Velocity = (b.Agent.Velocity + (force * dt)).Truncate(b.Agent.MaxSpeed);
-            b.Agent.HeadingRef = b.Steering.UpdateHeadingWhileMoving(dt, ref b.Agent.RotationDegrees);
-            b.Agent.Position = (b.Agent.Position + (b.Agent.Velocity * dt)).WrapPosition(windowSize);
+            boid.Agent.Velocity = (boid.Agent.Velocity + (force * deltaTime)).Truncate(boid.Agent.MaxSpeed);
+            boid.Agent.HeadingRef = boid.Steering.UpdateHeadingWhileMoving(deltaTime, ref boid.Agent.RotationDegrees);
+            boid.Agent.Position = (boid.Agent.Position + (boid.Agent.Velocity * deltaTime)).WrapPosition(windowSize);
         }
 
-        Fps = 1.0 / gameTime.Delta.TotalSeconds;
+        Fps = 1.0 / gameTime.DeltaTotalSeconds;
         UpdateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -156,15 +157,15 @@ internal sealed class ComboFlockLayer : ISceneLayer
     {
         for (int i = 0; i < _boids.Count; i++)
         {
-            Boid b = _boids[i];
+            Boid boid = _boids[i];
             IReadOnlyList<IMovableGameObject> neighbors = _neighborCache[i];
 
-            b.Debug.DrawNeighborhood(window, neighbors, NeighborhoodRadius);
-            b.Debug.DrawSeparation(window, neighbors, SeparationRadius);
-            b.Debug.DrawAlignment(window, neighbors);
-            b.Debug.DrawCohesion(window, neighbors);
-            b.Debug.DrawVelocityAndHeading(window);
-            b.Agent.Draw(window);
+            boid.Debug.DrawNeighborhood(window, neighbors, NeighborhoodRadius);
+            boid.Debug.DrawSeparation(window, neighbors, SeparationRadius);
+            boid.Debug.DrawAlignment(window, neighbors);
+            boid.Debug.DrawCohesion(window, neighbors);
+            boid.Debug.DrawVelocityAndHeading(window);
+            boid.Agent.Draw(window);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace GrayHare.GameEngine.DemoHub.Scenes.TextDemo;
 /// </summary>
 internal sealed class TextScene : DemoSceneBase
 {
-    private Font? _font;
+    private Font _font = null!;
 
     public TextScene(DemoCatalog catalog, int sceneIndex) : base(catalog, sceneIndex) { }
 
@@ -21,18 +21,6 @@ internal sealed class TextScene : DemoSceneBase
 
     public override void RenderLayer(GameHost host, RenderWindow window)
     {
-        if (_font is null)
-        {
-            using RectangleShape fallback = new(new SFML.System.Vector2f(700f, 160f))
-            {
-                Position = new(180f, 220f),
-                FillColor = new Color(60, 80, 110)
-            };
-
-            window.Draw(fallback);
-            return;
-        }
-
         float x = 80f;
         float y = 60f;
 
@@ -54,7 +42,7 @@ internal sealed class TextScene : DemoSceneBase
         ref float y,
         float gap)
     {
-        using Text label = new(_font!, text, size)
+        using Text label = new(_font, text, size)
         {
             Position = new Vector2f(x, y),
             FillColor = color

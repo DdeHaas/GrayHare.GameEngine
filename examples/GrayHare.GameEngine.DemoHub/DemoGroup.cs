@@ -5,6 +5,8 @@ internal sealed record DemoGroup
 {
     public DemoGroup(string name, int startIndex, int endIndex)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
         Name = name;
         StartIndex = startIndex;
         EndIndex = endIndex;

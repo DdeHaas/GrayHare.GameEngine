@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using SFML.Graphics;
 using SFML.System;
@@ -44,11 +43,11 @@ internal sealed class StarfieldLayer : ISceneLayer
 
     public void Update(GameHost host, in GameTime gameTime)
     {
-        float dt = gameTime.DeltaTotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
 
         for (int i = 0; i < StarCount; i++)
         {
-            _y[i] += _speed[i] * dt;
+            _y[i] += _speed[i] * deltaTime;
 
             if (_y[i] > _height)
             {

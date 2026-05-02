@@ -1,4 +1,3 @@
-using GrayHare.GameEngine.Abstractions;
 using GrayHare.GameEngine.Application;
 using GrayHare.GameEngine.Extensions;
 using SFML.Graphics;
@@ -37,6 +36,8 @@ internal sealed class GameOverLayer : ISceneLayer
 
     public GameOverLayer(Font font)
     {
+        ArgumentNullException.ThrowIfNull(font);
+
         _font = font;
     }
 
@@ -55,11 +56,11 @@ internal sealed class GameOverLayer : ISceneLayer
             return;
         }
 
-        float dt = gameTime.DeltaTotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
 
         const int waitDuration = 6; // seconds to wait before handling game over
 
-        _returnTimer += dt;
+        _returnTimer += deltaTime;
         _waitTimerText = new string('.', Math.Max(0, waitDuration - (int)_returnTimer)); // animate dots while waiting
         if (_returnTimer >= waitDuration)
         {

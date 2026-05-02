@@ -42,18 +42,18 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
     private const float MouseX = NumpadX + 4f * Ku + 16f; // 860
     private const float MouseY = KbY;                      // 80
 
-    private static readonly Color ColIdle = new(45, 48, 60);
-    private static readonly Color ColPressed = new(80, 200, 255);
-    private static readonly Color ColOutline = new(72, 76, 96);
-    private static readonly Color ColLabel = new(140, 145, 165);
-    private static readonly Color ColLabelOn = Color.White;
-    private static readonly Color ColSection = new(180, 190, 220);
+    private static readonly Color _colIdle = new(45, 48, 60);
+    private static readonly Color _colPressed = new(80, 200, 255);
+    private static readonly Color _colOutline = new(72, 76, 96);
+    private static readonly Color _colLabel = new(140, 145, 165);
+    private static readonly Color _colLabelOn = Color.White;
+    private static readonly Color _colSection = new(180, 190, 220);
 
     // ── Key row definitions ───────────────────────────────────────────────────
 
     private readonly record struct KeyDef(string Label, Keyboard.Key Key, float Units = 1f);
 
-    private static readonly KeyDef[] NumberRow =
+    private static readonly KeyDef[] _numberRow =
     [
         new("`",    Keyboard.Key.Grave),
         new("1",    Keyboard.Key.Num1),
@@ -71,7 +71,7 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
         new("Bksp", Keyboard.Key.Backspace, 2f),
     ];
 
-    private static readonly KeyDef[] QwertyRow =
+    private static readonly KeyDef[] _qwertyRow =
     [
         new("Tab", Keyboard.Key.Tab,       1.5f),
         new("Q",   Keyboard.Key.Q),
@@ -89,7 +89,7 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
         new("\\",  Keyboard.Key.Backslash, 1.5f),
     ];
 
-    private static readonly KeyDef[] AsdfRow =
+    private static readonly KeyDef[] _asdfRow =
     [
         // CapsLock has no Keyboard.Key enum value in SFML; always shown unlit.
         new("Caps",  Keyboard.Key.Unknown,   1.75f),
@@ -107,7 +107,7 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
         new("Enter", Keyboard.Key.Enter,     2.25f),
     ];
 
-    private static readonly KeyDef[] ZxcvRow =
+    private static readonly KeyDef[] _zxcvRow =
     [
         new("Shift", Keyboard.Key.LShift,  2.25f),
         new("Z",     Keyboard.Key.Z),
@@ -123,7 +123,7 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
         new("Shift", Keyboard.Key.RShift,  2.75f),
     ];
 
-    private static readonly KeyDef[] BottomRow =
+    private static readonly KeyDef[] _bottomRow =
     [
         new("Ctrl",  Keyboard.Key.LControl, 1.25f),
         new("Win",   Keyboard.Key.LSystem,  1.25f),
@@ -135,7 +135,7 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
         new("Ctrl",  Keyboard.Key.RControl, 1.25f),
     ];
 
-    private Font? _font;
+    private Font _font = null!;
     // Accumulated scroll delta with decay for visual feedback.
     private float _scrollLevel;
 
@@ -172,11 +172,6 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
 
     public override void RenderLayer(GameHost host, RenderWindow window)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         DrawKeyInfoSection(host, window);
         DrawKeyboard(host, window);
         DrawMousePanel(host, window);
@@ -190,15 +185,15 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
         DrawFnRow(host, window);
 
         float y = NavY;
-        DrawKeyRow(host, window, KbX, y, NumberRow);
+        DrawKeyRow(host, window, KbX, y, _numberRow);
         y += Kh + Kg;
-        DrawKeyRow(host, window, KbX, y, QwertyRow);
+        DrawKeyRow(host, window, KbX, y, _qwertyRow);
         y += Kh + Kg;
-        DrawKeyRow(host, window, KbX, y, AsdfRow);
+        DrawKeyRow(host, window, KbX, y, _asdfRow);
         y += Kh + Kg;
-        DrawKeyRow(host, window, KbX, y, ZxcvRow);
+        DrawKeyRow(host, window, KbX, y, _zxcvRow);
         y += Kh + Kg;
-        DrawKeyRow(host, window, KbX, y, BottomRow);
+        DrawKeyRow(host, window, KbX, y, _bottomRow);
 
         DrawNavCluster(host, window);
         DrawNumpad(host, window);
@@ -292,25 +287,20 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
         using RectangleShape rect = new(new Vector2f(w, h))
         {
             Position = new Vector2f(x, y),
-            FillColor = pressed ? ColPressed : ColIdle,
-            OutlineColor = ColOutline,
+            FillColor = pressed ? _colPressed : _colIdle,
+            OutlineColor = _colOutline,
             OutlineThickness = 1f
         };
         window.Draw(rect);
 
-        if (_font is null)
-        {
-            return;
-        }
-
         uint fontSize = label.Length <= 2 ? 14u : label.Length <= 4 ? 11u : 9u;
         using Text lbl = new(_font, label, fontSize)
         {
-            FillColor = pressed ? ColLabelOn : ColLabel
+            FillColor = pressed ? _colLabelOn : _colLabel
         };
 
-        FloatRect b = lbl.GetLocalBounds();
-        lbl.Origin = new Vector2f(b.Left + b.Width / 2f, b.Top + b.Height / 2f);
+        FloatRect bounds = lbl.GetLocalBounds();
+        lbl.Origin = new Vector2f(bounds.Left + bounds.Width / 2f, bounds.Top + bounds.Height / 2f);
         lbl.Position = new Vector2f(x + w / 2f, y + h / 2f);
         window.Draw(lbl);
     }
@@ -331,15 +321,10 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
         };
         window.Draw(strip);
 
-        if (_font is null)
-        {
-            return;
-        }
-
         using Text caption = new(_font, "Keys:", 13)
         {
             Position = new Vector2f(KbX + 6f, KeyInfoY + 4f),
-            FillColor = ColSection
+            FillColor = _colSection
         };
         window.Draw(caption);
 
@@ -360,11 +345,11 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
             using Text t = new(_font, chip, 13)
             {
                 Position = new Vector2f(x, KeyInfoY + 4f),
-                FillColor = ColPressed
+                FillColor = _colPressed
             };
 
-            FloatRect b = t.GetLocalBounds();
-            x += b.Left + b.Width + 14f;
+            FloatRect bounds = t.GetLocalBounds();
+            x += bounds.Left + bounds.Width + 14f;
             window.Draw(t);
         }
 
@@ -549,11 +534,6 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
 
     private void DrawMouseInfo(GameHost host, RenderWindow window)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         float x = MouseX + 160f;
         float y = MouseY;
 
@@ -578,11 +558,6 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
 
     private void DrawInfoRow(RenderWindow window, float x, float y, string label, bool pressed, Color activeColor)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         const float dotR = 6f;
         using CircleShape dot = new(dotR)
         {
@@ -597,22 +572,17 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
         using Text lbl = new(_font, label, 15)
         {
             Position = new Vector2f(x + 18f, y),
-            FillColor = pressed ? activeColor : ColLabel
+            FillColor = pressed ? activeColor : _colLabel
         };
         window.Draw(lbl);
     }
 
     private void DrawScrollBar(RenderWindow window, float x, float y)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         using Text title = new(_font, "Scroll", 14)
         {
             Position = new Vector2f(x, y),
-            FillColor = ColLabel
+            FillColor = _colLabel
         };
         window.Draw(title);
 
@@ -654,29 +624,19 @@ internal sealed class KeyboardMouseScene : DemoSceneBase
 
     private void DrawSectionLabel(RenderWindow window, float x, float y, string text)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         using Text lbl = new(_font, text, 16)
         {
             Position = new Vector2f(x, y),
-            FillColor = ColSection
+            FillColor = _colSection
         };
         window.Draw(lbl);
     }
 
     private void DrawCenteredLabel(RenderWindow window, float cx, float y, string text, bool active, Color activeColor)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         using Text lbl = new(_font, text, 14)
         {
-            FillColor = active ? activeColor : ColLabel
+            FillColor = active ? activeColor : _colLabel
         };
         FloatRect b = lbl.GetLocalBounds();
         lbl.Origin = new Vector2f(b.Left + b.Width / 2f, b.Top);

@@ -11,6 +11,11 @@ internal sealed record DemoEntry
         string description,
         Func<DemoCatalog, int, GameSceneBase> factory)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
+        ArgumentException.ThrowIfNullOrWhiteSpace(groupName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        ArgumentNullException.ThrowIfNull(factory);
+
         Title = title;
         GroupName = groupName;
         Description = description;

@@ -39,7 +39,7 @@ internal sealed class FollowPathScene : DemoSceneBase
     private int _pathIndex;
     private int _selectedPathIndex;
     private PathFollowMode _followMode;
-    private Font? _font;
+    private Font _font = null!;
     private double _fps;
     private double _updateMs;
 
@@ -71,7 +71,7 @@ internal sealed class FollowPathScene : DemoSceneBase
 
         HandleControls(host);
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
 
         // Wrap path index so the agent loops forever
         if (_pathIndex >= _path.Count)
@@ -81,17 +81,17 @@ internal sealed class FollowPathScene : DemoSceneBase
 
         if (_followMode == PathFollowMode.OnDot)
         {
-            FollowPathOnDot(dt);
+            FollowPathOnDot(deltaTime);
         }
         else
         {
             Vector2f force = _steering.FollowPath(ref _pathIndex, _path, SlowingRadius);
-            _agent.Velocity = (_agent.Velocity + (force * dt)).Truncate(_agent.MaxSpeed);
-            _agent.HeadingRef = _steering.UpdateHeadingWhileMoving(dt, ref _agent.RotationDegrees);
-            _agent.Position += _agent.Velocity * dt;
+            _agent.Velocity = (_agent.Velocity + (force * deltaTime)).Truncate(_agent.MaxSpeed);
+            _agent.HeadingRef = _steering.UpdateHeadingWhileMoving(deltaTime, ref _agent.RotationDegrees);
+            _agent.Position += _agent.Velocity * deltaTime;
         }
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -103,10 +103,7 @@ internal sealed class FollowPathScene : DemoSceneBase
         _debug.DrawVelocityAndHeading(window);
         _agent.Draw(window);
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 
     private void DrawPath(RenderWindow window)
@@ -132,11 +129,6 @@ internal sealed class FollowPathScene : DemoSceneBase
 
     private void DrawSelectedPath(RenderWindow window)
     {
-        if (_font is null)
-        {
-            return;
-        }
-
         string mode = _followMode == PathFollowMode.Smooth ? "Smooth" : "On-Dot";
         string text = $"Path {_selectedPathIndex + 1}/{PathOptions.Length}: {PathOptions[_selectedPathIndex].Name}   Mode: {mode}";
 
@@ -185,6 +177,7 @@ internal sealed class FollowPathScene : DemoSceneBase
         if (_path.Count < 2)
         {
             _agent.Velocity = Constants.Vectors.Zero;
+
             return;
         }
 

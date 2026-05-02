@@ -62,7 +62,7 @@ internal sealed class OffsetPursuitScene : DemoSceneBase
     }
 
     private readonly List<Follower> _followers = [];
-    private Font? _font;
+    private Font _font = null!;
     private double _fps;
     private double _updateMs;
 
@@ -103,25 +103,25 @@ internal sealed class OffsetPursuitScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
         Vector2f windowSize = new(host.Window.Size.X, host.Window.Size.Y);
 
         // Leader wanders and wraps around the window edges.
         Vector2f leaderForce = _leaderSteering.Wander(ref _leaderWander, WanderRadius, WanderDistance);
-        _leader.Velocity = (_leader.Velocity + (leaderForce * dt)).Truncate(_leader.MaxSpeed);
-        _leader.HeadingRef = _leaderSteering.UpdateHeadingWhileMoving(dt, ref _leader.RotationDegrees);
-        _leader.Position = (_leader.Position + (_leader.Velocity * dt)).WrapPosition(windowSize);
+        _leader.Velocity = (_leader.Velocity + (leaderForce * deltaTime)).Truncate(_leader.MaxSpeed);
+        _leader.HeadingRef = _leaderSteering.UpdateHeadingWhileMoving(deltaTime, ref _leader.RotationDegrees);
+        _leader.Position = (_leader.Position + (_leader.Velocity * deltaTime)).WrapPosition(windowSize);
 
         // Each follower pursues its assigned formation slot.
         foreach (Follower follower in _followers)
         {
             Vector2f force = follower.Steering.OffsetPursuit(_leader, follower.Offset, SlowingRadius);
-            follower.Agent.Velocity = (follower.Agent.Velocity + (force * dt)).Truncate(follower.Agent.MaxSpeed);
-            follower.Agent.HeadingRef = follower.Steering.UpdateHeadingWhileMoving(dt, ref follower.Agent.RotationDegrees);
-            follower.Agent.Position = (follower.Agent.Position + (follower.Agent.Velocity * dt)).WrapPosition(windowSize);
+            follower.Agent.Velocity = (follower.Agent.Velocity + (force * deltaTime)).Truncate(follower.Agent.MaxSpeed);
+            follower.Agent.HeadingRef = follower.Steering.UpdateHeadingWhileMoving(deltaTime, ref follower.Agent.RotationDegrees);
+            follower.Agent.Position = (follower.Agent.Position + (follower.Agent.Velocity * deltaTime)).WrapPosition(windowSize);
         }
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -138,9 +138,6 @@ internal sealed class OffsetPursuitScene : DemoSceneBase
         _leaderDebug.DrawWander(window, _leaderWander, WanderRadius, WanderDistance);
         _leader.Draw(window);
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 }

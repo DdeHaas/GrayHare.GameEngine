@@ -26,7 +26,7 @@ internal sealed class PathfindingScene : DemoSceneBase
     private FlowFieldResult? _flowField;
     private bool _showVisited = true;
     private bool _dirty = true;
-    private Font? _font;
+    private Font _font = null!;
 
     public PathfindingScene(DemoCatalog catalog, int sceneIndex)
         : base(catalog, sceneIndex)
@@ -128,11 +128,6 @@ internal sealed class PathfindingScene : DemoSceneBase
         {
             PathfindingDebugDrawer.DrawResult(
                 window, _result, CellSize, GridOrigin, _showVisited);
-        }
-
-        if (_font is null)
-        {
-            return;
         }
 
         string pathInfo = _result is not null

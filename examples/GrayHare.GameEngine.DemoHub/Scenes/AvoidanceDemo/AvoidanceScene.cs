@@ -20,7 +20,7 @@ internal sealed class AvoidanceScene : DemoSceneBase
     private List<Wall> _walls = [];
     private readonly List<ObstacleCircle> _obstacles = [];
     private float _wanderAngle;
-    private Font? _font;
+    private Font _font = null!;
     private double _fps;
     private double _updateMs;
 
@@ -56,10 +56,10 @@ internal sealed class AvoidanceScene : DemoSceneBase
             new Wall(new Vector2f(w - Margin, Margin), new Vector2f(w - Margin, h - Margin)),   // right
             new Wall(new Vector2f(w - Margin, h - Margin), new Vector2f(Margin, h - Margin)),   // bottom
             new Wall(new Vector2f(Margin, h - Margin), new Vector2f(Margin, Margin)),           // left
-            new Wall(new Vector2f(250f, 180f), new Vector2f(450f, 380f)),                        // diagonal ↘ front
-            new Wall(new Vector2f(450f, 380f), new Vector2f(250f, 180f)),                        // diagonal ↖ back
-            new Wall(new Vector2f(900f, 200f), new Vector2f(700f, 480f)),                        // diagonal ↙ front
-            new Wall(new Vector2f(700f, 480f), new Vector2f(900f, 200f)),                        // diagonal ↗ back
+            new Wall(new Vector2f(250f, 180f), new Vector2f(450f, 380f)),                       // diagonal ↘ front
+            new Wall(new Vector2f(450f, 380f), new Vector2f(250f, 180f)),                       // diagonal ↖ back
+            new Wall(new Vector2f(900f, 200f), new Vector2f(700f, 480f)),                       // diagonal ↙ front
+            new Wall(new Vector2f(700f, 480f), new Vector2f(900f, 200f)),                       // diagonal ↗ back
         ];
 
         _obstacles.Clear();
@@ -97,7 +97,7 @@ internal sealed class AvoidanceScene : DemoSceneBase
             SteeringDebugDrawer.Enabled = !SteeringDebugDrawer.Enabled;
         }
 
-        float dt = (float)gameTime.Delta.TotalSeconds;
+        float deltaTime = gameTime.DeltaTotalSeconds;
 
         Vector2f wanderForce = _steering.Wander(ref _wanderAngle, WanderRadius, WanderDistance);
         Vector2f obstacleForce = _steering.ObstacleAvoidance(_obstacles, DetectionLength, AgentRadius);
@@ -117,11 +117,11 @@ internal sealed class AvoidanceScene : DemoSceneBase
             (boundsForce, 3f),
             (wallForce, 4f));  // highest weight: wall avoidance always dominates
 
-        _agent.Velocity = (_agent.Velocity + (force * dt)).Truncate(_agent.MaxSpeed);
-        _agent.HeadingRef = _steering.UpdateHeadingWhileMoving(dt, ref _agent.RotationDegrees);
-        _agent.Position += _agent.Velocity * dt;
+        _agent.Velocity = (_agent.Velocity + (force * deltaTime)).Truncate(_agent.MaxSpeed);
+        _agent.HeadingRef = _steering.UpdateHeadingWhileMoving(deltaTime, ref _agent.RotationDegrees);
+        _agent.Position += _agent.Velocity * deltaTime;
 
-        _fps = 1.0 / gameTime.Delta.TotalSeconds;
+        _fps = 1.0 / gameTime.DeltaTotalSeconds;
         _updateMs = gameTime.Delta.TotalMilliseconds;
     }
 
@@ -140,10 +140,7 @@ internal sealed class AvoidanceScene : DemoSceneBase
         _debug.DrawVelocityAndHeading(window);
         _agent.Draw(window);
 
-        if (_font is not null)
-        {
-            SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
-        }
+        SteeringDebugDrawer.DrawStats(window, _font, _fps, _updateMs);
     }
 
     private void DrawWalls(RenderWindow window)

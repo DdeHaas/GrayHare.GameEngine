@@ -300,6 +300,7 @@ public sealed class InputActionMap
     public void ClearAction(string action)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(action);
+
         _keyBindings.Remove(action);
         _buttonBindings.Remove(action);
         _axisBindings.Remove(action);
