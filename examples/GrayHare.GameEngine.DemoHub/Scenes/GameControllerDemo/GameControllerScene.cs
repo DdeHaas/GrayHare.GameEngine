@@ -53,17 +53,14 @@ internal sealed class GameControllerScene : DemoSceneBase
     {
         bool connected = host.Input.IsJoystickConnected(0);
 
-        DrawHeader(window, connected);
+        DrawController(host, window);
 
-        if (connected)
-        {
-            DrawController(host, window);
-        }
-        else
+        if (!connected)
         {
             DrawNotConnected(window);
         }
 
+        DrawHeader(window, connected);
         DrawFooter(host, window, connected);
     }
 
@@ -83,6 +80,13 @@ internal sealed class GameControllerScene : DemoSceneBase
 
     private void DrawNotConnected(RenderWindow window)
     {
+        using var veil = new RectangleShape(new Vector2f(window.Size.X, window.Size.Y))
+        {
+            Position = Constants.Vectors.Zero,
+            FillColor = new Color(80, 80, 80, 200)
+        };
+        window.Draw(veil);
+
         using Text msg = new(_font,
             "Connect a Game controller to joystick port 0.", 20)
         {
