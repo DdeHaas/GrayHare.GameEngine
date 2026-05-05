@@ -39,7 +39,7 @@ The DemoHub creates its demo assets automatically on first run.
 
 ## Documentation
 
-Additional documentation is available in [`docs\README.md`](docs/README.md). A Dutch version is available in [`docs\README.nl.md`](docs/README.nl.md).
+Additional documentation is available in [`docs\README.md`](docs/README.md).
 
 A step-by-step guide for building a basic Tetris game is available in [`docs\how-to-tetris.md`](docs/how-to-tetris.md).
 

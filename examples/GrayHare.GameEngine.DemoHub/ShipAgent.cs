@@ -28,7 +28,7 @@ internal sealed class ShipAgent : IMovableGameObject
     Vector2f IMovableGameObject.Heading => HeadingRef;
     Vector2f IMovableGameObject.Side => HeadingRef.Perpendicular();
     Vector2f IMovableGameObject.Velocity => Velocity;
-    float IMovableGameObject.Speed => Velocity.Length;
+    public float Speed => Velocity.Length;
     public float Acceleration => 240f;
     public float Deceleration => 80f;
     public float BrakingDeceleration => 320f;
@@ -38,12 +38,14 @@ internal sealed class ShipAgent : IMovableGameObject
 
     // Behaviors (created once, reused each frame)
     public RotationBehavior Rotation { get; }
+    public MovementBehavior Strafing { get; }
     public MovementWithRotationBehavior Movement { get; }
     public MovementWithDriftingBehavior Drifting { get; }
 
     public ShipAgent()
     {
         Rotation = new RotationBehavior(this);
+        Strafing = new MovementBehavior(this);
         Movement = new MovementWithRotationBehavior(this);
         Drifting = new MovementWithDriftingBehavior(this);
     }

@@ -113,7 +113,6 @@ internal sealed class ShaderWaveScene : DemoSceneBase
         }
 
         _shader.SetUniform("u_time", (float)gameTime.Total.TotalSeconds);
-        _shader.SetUniform("wave_amplitude", Constants.Vectors.One);
     }
 
     public override void RenderLayer(GameHost host, RenderWindow window)

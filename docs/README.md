@@ -65,7 +65,7 @@ all composed with minimal boilerplate. The engine's sole external dependency is 
 │                        GameHost                             │
 │          service locator — passed to every scene            │
 │  Window │ Input │ Assets │ Audio │ World │ Camera │ Options │
-└──┬───────┬────────┬─────────┬───────┬────────┬─────────────┘
+└──┬───────┬────────┬─────────┬───────┬────────┬──────────────┘
    │       │        │         │       │        │
    ▼       ▼        ▼         ▼       ▼        ▼
 Render  Input    Asset    Audio    ECS    Camera2D
@@ -669,8 +669,7 @@ independent — suitable for free-drifting movement (top-down tanks, space shoot
 | `IsStrafingRight` | Strafe perpendicular-right relative to heading |
 | `UpdateMovement(deltaTime, currentVelocity)` | Compute and return the new velocity for this frame |
 
-> **See demos:** [`MovementDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/MovementDemo),
-> [`StrafingDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/StrafingDemo)
+> **See demos:** [`MovementDemos`](../examples/GrayHare.GameEngine.DemoHub/Scenes/MovementDemos),
 
 ---
 
@@ -688,7 +687,7 @@ Couples heading rotation to movement direction. Heading, position, and velocity 
 | `IsTurningRight` | Rotate the heading clockwise |
 | `UpdateMovement(deltaTime, currentVelocity, currentRotation)` | Returns the new `(velocity, rotation)` tuple for this frame |
 
-> **See demo:** [`MovementDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/MovementDemo)
+> **See demo:** [`MovementDemos`](../examples/GrayHare.GameEngine.DemoHub/Scenes/MovementDemos)
 
 ---
 
@@ -707,7 +706,7 @@ a drifting/slide feel.
 | `IsTurningRight` | Rotate heading clockwise |
 | `UpdateMovement(deltaTime, currentVelocity, currentRotation)` | Returns the new `(velocity, rotation)` tuple for this frame |
 
-> **See demo:** [`DriftingDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/DriftingDemo)
+> **See demo:** [`MovementDemos`](../examples/GrayHare.GameEngine.DemoHub/Scenes/MovementDemos)
 
 ---
 
@@ -724,7 +723,7 @@ Rotates an object toward a target angle or target position, with configurable tu
 
 `RotationDirection` is an enum with values `Clockwise` and `CounterClockwise`.
 
-> **See demo:** [`StrafingDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/StrafingDemo)
+> **See demo:** [`MovementDemos`](../examples/GrayHare.GameEngine.DemoHub/Scenes/MovementDemos)
 
 ---
 
@@ -757,7 +756,7 @@ position    += velocity * deltaTime
 | `Alignment(neighbors)` | `IReadOnlyList<IMovableGameObject>` | Match the average heading of neighbors |
 | `Cohesion(neighbors)` | `IReadOnlyList<IMovableGameObject>` | Seek the average position of neighbors |
 
-> **See demos:** [`SteeringDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/SteeringDemo),
+> **See demos:** [`MovementDemos`](../examples/GrayHare.GameEngine.DemoHub/Scenes/MovementDemos),
 > [`SeekArriveDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/SeekArriveDemo),
 > [`PursueEvadeDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/PursueEvadeDemo),
 > [`InterposeDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/InterposeDemo),
@@ -849,6 +848,7 @@ Extension methods on SFML shapes.
 | `ToTexture(shape, padding?)` | `int` | `Texture` | Rasterize any `Shape` to a reusable `Texture`; `padding` adds extra pixels around the shape |
 
 > **See demo:** [`ShapeTextureDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/ShapeTextureDemo)
+> [`MovementDemos`](../examples/GrayHare.GameEngine.DemoHub/Scenes/MovementDemos)
 
 ---
 
@@ -862,7 +862,6 @@ Extension methods on `RenderWindow`.
 
 > **See demos:** [`SpriteDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/SpriteDemo),
 > [`TextDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/TextDemo),
-> [`SteeringDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/SteeringDemo)
 
 ---
 
