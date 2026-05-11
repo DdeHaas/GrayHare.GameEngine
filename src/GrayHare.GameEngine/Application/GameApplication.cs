@@ -40,8 +40,8 @@ public sealed class GameApplication
         using RenderWindow window = new(
             new VideoMode(_options.WindowSize),
             _options.Title,
-            Styles.Default,
-            State.Windowed);
+            _options.Styles,
+            _options.State);
 
         window.SetVerticalSyncEnabled(_options.VerticalSyncEnabled);
         if (_options.FrameRateLimit > 0)

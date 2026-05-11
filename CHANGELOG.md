@@ -6,6 +6,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.8.0] - 2026-05-11
+
+### Added
+
+- RenderWindow extension GetCenter
+- Option to set Window style & state for the GameApplication
+
+### Fixed
+
+- Cleanup unused files that caused build failure
+
+
 ## [0.7.0] - 2026-05-02
 
 ### Added

@@ -184,6 +184,8 @@ every scene and layer throughout the frame.
 | `VerticalSyncEnabled` | `bool` | `true` | Enable vertical synchronization |
 | `ContentRootPath` | `string` | `AppContext.BaseDirectory` | Root directory for resolving relative asset paths |
 | `LogHandler` | `Action<string>?` | `null` | Optional delegate for engine diagnostics; `null` falls back to `Debug.WriteLine` |
+| `State` | `SFML.Window.State` | `State.Windowed` | Window state (Windowed | Fullscreen) |
+| `Style` | `SFML.Window.Styles` | `Stiles.Default` | Window style (None | Titlebar | Resize | Close | Default) |
 
 ---
 
@@ -832,10 +834,10 @@ Extension methods on `Vector2f`.
 
 | Method | Parameters | Return Type | Description |
 |--------|-----------|-------------|-------------|
-| `DistanceTo(v, other)` | `Vector2f` | `float` | Euclidean distance between two positions |
-| `Truncate(v, maxLength)` | `float` | `Vector2f` | Clamp the vector's length to `maxLength` |
-| `WrapPosition(v, worldSize)` | `Vector2f` | `Vector2f` | Wrap a position for toroidal (screen-edge) movement |
-| `WrapPosition(v, windowSize)` | `Vector2u` | `Vector2f` | `Vector2u` overload |
+| `DistanceTo(vector, other)` | `Vector2f` | `float` | Euclidean distance between two positions |
+| `Truncate(vector, maxLength)` | `float` | `Vector2f` | Clamp the vector's length to `maxLength` |
+| `WrapPosition(vector, worldSize)` | `Vector2f` | `Vector2f` | Wrap a position for toroidal (screen-edge) movement |
+| `WrapPosition(vector, windowSize)` | `Vector2u` | `Vector2f` | `Vector2u` overload |
 
 ---
 
@@ -859,6 +861,7 @@ Extension methods on `RenderWindow`.
 | Method | Parameters | Return Type | Description |
 |--------|-----------|-------------|-------------|
 | `DrawCenteredText(window, font, size, color, text, y, style?)` | `Font`, `uint`, `Color`, `string`, `float`, `Text.Styles?` | `void` | Draw text horizontally centered at the given Y coordinate |
+| `GetCenter(window)` | | `Vector2f` | Returns the center coordinates |
 
 > **See demos:** [`SpriteDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/SpriteDemo),
 > [`TextDemo`](../examples/GrayHare.GameEngine.DemoHub/Scenes/TextDemo),

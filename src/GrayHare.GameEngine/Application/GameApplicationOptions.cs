@@ -1,5 +1,6 @@
 using SFML.Graphics;
 using SFML.System;
+using SFML.Window;
 
 namespace GrayHare.GameEngine.Application;
 
@@ -14,6 +15,12 @@ public sealed class GameApplicationOptions
 
     /// <summary>Color used to clear the window each frame before rendering.</summary>
     public Color ClearColor { get; init; } = new(18, 24, 32);
+
+    /// <summary>Window styles (e.g. title bar, borders, resizable). Defaults to <see cref="Styles.Default"/>.</summary>
+    public Styles Styles { get; init; } = Styles.Default;
+
+    /// <summary>Initial window state. Defaults to <see cref="State.Windowed"/>.</summary>
+    public State State { get; init; } = State.Windowed;
 
     /// <summary>Frame-rate cap (0 = uncapped). Ignored when <see cref="VerticalSyncEnabled"/> is true.</summary>
     public uint FrameRateLimit { get; init; } = 60;

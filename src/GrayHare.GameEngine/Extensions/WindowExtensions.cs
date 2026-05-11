@@ -40,4 +40,14 @@ public static class WindowExtensions
 
         window.Draw(fontText);
     }
+
+    /// <summary>
+    /// Returns the coordinates of the center point of the render window as a <see cref="Vector2f"/>.
+    /// </summary>
+    /// <param name="window">The render window for which to calculate the center point.</param>
+    /// <returns>A <see cref="Vector2f"/> representing the center point of the render window.</returns>
+    public static Vector2f GetCenter(this RenderWindow window)
+    {
+        return new Vector2f(window.Size.X / 2f, window.Size.Y / 2f);
+    }
 }
